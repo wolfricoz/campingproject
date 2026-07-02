@@ -20,7 +20,8 @@ const submit = () => {
 <template>
     <GuestLayout>
         <Head title="Confirm Password" />
-
+        <div class="flex justify-center items-center p-20">
+            <div class="w-1/4  border border-gray-500/60 p-6 rounded-xl">
         <div class="mb-4 text-sm text-gray-600">
             This is a secure area of the application. Please confirm your
             password before continuing.
@@ -51,5 +52,6 @@ const submit = () => {
                 </PrimaryButton>
             </div>
         </form>
+            </div></div>
     </GuestLayout>
 </template>

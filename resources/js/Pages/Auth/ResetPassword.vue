@@ -34,7 +34,8 @@ const submit = () => {
 <template>
     <GuestLayout>
         <Head title="Reset Password" />
-
+        <div class="flex justify-center items-center p-20">
+            <div class="w-1/4  border border-gray-500/60 p-6 rounded-xl">
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
@@ -96,6 +97,6 @@ const submit = () => {
                     Reset Password
                 </PrimaryButton>
             </div>
-        </form>
+        </form></div></div>
     </GuestLayout>
 </template>

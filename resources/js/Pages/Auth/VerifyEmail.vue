@@ -23,6 +23,8 @@ const verificationLinkSent = computed(
 
 <template>
     <GuestLayout>
+        <div class="flex justify-center items-center p-20">
+            <div class="w-1/4  border border-gray-500/60 p-6 rounded-xl">
         <Head title="Email Verification" />
 
         <div class="mb-4 text-sm text-gray-600">
@@ -57,5 +59,6 @@ const verificationLinkSent = computed(
                 >
             </div>
         </form>
+            </div></div>
     </GuestLayout>
 </template>

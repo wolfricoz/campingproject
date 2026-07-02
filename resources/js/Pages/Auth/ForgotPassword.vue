@@ -24,7 +24,10 @@ const submit = () => {
 <template>
     <GuestLayout>
         <Head title="Forgot Password" />
-
+        <div class="flex justify-center items-center p-20">
+            <div class="w-1/4  border border-gray-500/60 p-6 rounded-xl">
+        <div class="flex justify-center items-center p-20">
+            <div class="w-1/4  border border-gray-500/60 p-6 rounded-xl">
         <div class="mb-4 text-sm text-gray-600">
             Forgot your password? No problem. Just let us know your email
             address and we will email you a password reset link that will allow
@@ -63,6 +66,9 @@ const submit = () => {
                     Email Password Reset Link
                 </PrimaryButton>
             </div>
+
         </form>
+            </div></div>
+            </div></div>
     </GuestLayout>
 </template>
