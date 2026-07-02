@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.nav-button {
+    @apply text-gray-600 font-medium hover:text-emerald-700 transition-colors;
+}
