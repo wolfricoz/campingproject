@@ -22,9 +22,9 @@ function handleImageError() {
     <div class="min-h-screen flex flex-col">
         <main class="flex-1 flex flex-col">
             <!--  === Navbar ===  -->
-            <div class="flex items-center justify-center px-16 py-4 w-full bg-white shadow-sm border-b border-gray-200">
+            <div class="flex items-center justify-center px-16 py-4 w-full bg-blue-600 shadow-sm border-b border-gray-200">
                 <div id="navbar" class="flex flex-row items-center gap-8 w-2/3">
-                    <h1 class="text-xl font-bold text-emerald-800 tracking-tight">
+                    <h1 class="text-xl font-bold text-white tracking-tight">
                         Syntec Camping
                     </h1>
                     <div class="flex flex-row gap-6 ml-auto">

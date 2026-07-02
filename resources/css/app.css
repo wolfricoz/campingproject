@@ -4,5 +4,5 @@
 
 
 .nav-button {
-    @apply text-gray-600 font-medium hover:text-emerald-700 transition-colors;
+    @apply text-gray-200 font-medium hover:text-emerald-700 transition-colors;
 }
