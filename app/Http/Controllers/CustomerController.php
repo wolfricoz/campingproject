@@ -52,7 +52,12 @@ class CustomerController extends Controller
             $data['user_id'] = $user->id;
         }
         unset($data['create_account']);
-        $result = Customer::updateOrCreate(['id' => $data['id']], $data);
+        if(!$customer){
+            unset($data['id']);
+            $result = Customer::create($data);
+        } else{
+            $result = $customer->update($data);
+        }
         return response()->json(['status' => "success!", 'updated_data' => $result]);
 
     }

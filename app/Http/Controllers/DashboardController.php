@@ -27,7 +27,7 @@ class DashboardController extends Controller
             ->where(function (Builder $query) use ($start, $end) {
                 $query->whereBetween('start_date', [$start, $end])
                     ->orWhereBetween('end_date', [$start, $end]);
-            })->get();
+            })->where('booking_status','!=', 'cancelled')->get();
 
 
 

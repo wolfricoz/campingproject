@@ -44,7 +44,6 @@ function fetchLocations(){
 }
 function fetchCustomers(){
     axios.get(route('api.customers.index')).then(response => {
-        console.log(response);
         customers.value = response.data;
     }).catch(error => {
         console.log(error);
@@ -88,9 +87,25 @@ watch(() => props.arrangement, (arrangement) => {
 
 // When a customer is picked from the dropdown, copy their details into the editable block
 watch(() => form.value.customer_id, (id) => {
-    const found = customers.find((c) => c.id === id);
-    if (!found) return;
+    const found = customers.value.find((c) => c.id === id);
+    if (!found) {
+        form.value.customer = {
+            id: form.value.customer_id,
+            name: '',
+            email: '',
+            phone_number: '',
+            street_name: '',
+            street_number: '',
+            postal_code: '',
+            city:  '',
+            country: '',
+            create_account: false,
+        };
+        console.log('couldn\'t find person.');
+        return;
+    }
     form.value.customer = {
+        id: form.value.customer_id,
         name: found.name ?? '',
         email: found.email ?? '',
         phone_number: found.phone_number ?? '',
@@ -112,18 +127,26 @@ function close() {
     emit('close');
 }
 
-function save() {
+async function save() {
     // save the changes
-    axios.post(route('api.arrangements.store'), form.value)
-        .then(response => {
-            console.log(response);
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    axios.post(route('api.customers.store'), form.value)
-    // send the changes to the parent to display; cant have old data showing.
-    emit('save', { ...form.value });
+    try {
+
+        const customerRes = await axios.post(route('api.customers.store'), form.value);
+        if (customerRes?.data?.updated_data?.id){
+            form.value.customer_id = customerRes.data.updated_data.id;
+            form.value.customer.id = customerRes.data.updated_data.id;
+        }
+
+
+        const arrangementRes = await axios.post(route('api.arrangements.store'), form.value);
+        form.value.id = arrangementRes.data.updated_data.id; // capture new arrangement id too
+
+        emit('save', { ...form.value });
+
+    } catch (error) {
+        console.log(error);
+
+    }
 }
 fetchLocations();
 fetchCustomers()
@@ -171,7 +194,7 @@ const endTimePart = computed({
 
 <template>
     <div v-if="showModal"
-         class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20 z-50"
+         class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20 z-50 cursor-default"
          @click.self="close"
     >
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -191,6 +214,7 @@ const endTimePart = computed({
                         <select v-model="form.customer_id"
                                 class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
                             <option :value="null">— Selecteer klant —</option>
+                            <option :value="0">Nieuwe Klant</option>
                             <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
                         </select>
                     </div>
@@ -293,27 +317,34 @@ const endTimePart = computed({
                     </div>
 
                     <!-- Create account checkbox -->
-                    <label class="flex items-center gap-2 mt-4 text-sm text-gray-700">
+                    <label class="flex items-center gap-2 mt-4 text-sm text-gray-700"  v-if="!arrangement?.customer.user_id">
                         <input type="checkbox" v-model="form.customer.create_account"
                                class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                               :disabled="!!arrangement.customer.user_id"/>
+                              />
                         Account aanmaken voor deze klant
                     </label>
+                    <span v-else class="flex items-center gap-2 mt-4 text-sm text-gray-700">
+                        Klant heeft al een account
+                    </span>
                 </div>
             </div>
 
             <!-- Footer -->
             <div class="flex justify-between gap-2 px-6 py-4 border-t border-gray-200">
                 <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
-                    <button v-if="arrangement.booking_status !== 'checked-in'"
+                    <button v-if="arrangement?.booking_status !== 'checked-in'"
                             class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-                            @click="save">
+                            @click="save"
+                            v-show="props.arrangement"
+                    >
                         check-in
                     </button>
                     <button class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700" @click="save">
                         {{ props.arrangement ? 'Bijwerken' : 'Opslaan' }}
                     </button>
-                    <button class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700" @click="save">
+                    <button class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700" @click="save"
+                        v-show="props.arrangement"
+                    >
                         Reservatie Annuleren
                     </button>
                 </div>

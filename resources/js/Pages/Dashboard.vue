@@ -2,7 +2,8 @@
 import AuthenticatedLayout from '@/Layouts/DashboardLayout.vue';
 import {Head} from '@inertiajs/vue3';
 import ArrangementCard from "@/Components/calendar/ArrangementCard.vue";
-import {computed} from "vue";
+import {computed, ref} from "vue";
+import ArrangementModal from "@/Components/calendar/ArrangementModal.vue";
 
 const props = defineProps({
     arrangements: {
@@ -12,9 +13,6 @@ const props = defineProps({
 
 
 // === Functions  ===
-
-
-
 function getWeek(now) {
     let d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     let dayNum = d.getDay() || 7;
@@ -78,7 +76,8 @@ function onSave(data) {
     // Find the arrangement
     const arrangement = props.arrangements.find(a => a.id === data.id);
     if (!arrangement) {
-        console.warn('onSave: no arrangement found with id', data.id);
+        props.arrangements.push(data);
+        showCreateModal.value = false;
         return;
     }
 
@@ -102,30 +101,38 @@ function onSave(data) {
         arrangement.customer.country = data.customer.country ?? '';
         arrangement.customer.create_account = data.customer.create_account ?? false;
     }
-
+    showCreateModal.value = false;
 
 }
-
+// === Data ===
 const now = new Date();
 const weekNumber = getWeek(now);
 const monthName = new Date().toLocaleDateString('nl-NL', {month: 'long', year: 'numeric'});
-
-
 const days = computed(() => populateArrangements());
-
+const showCreateModal = ref(false);
 
 
 </script>
 
 <template>
     <Head title="Dashboard"/>
+    <div v-if="showCreateModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20" >
+        <arrangement-modal :show-modal="showCreateModal" @close="showCreateModal = false" @save="onSave">
 
+        </arrangement-modal>
+    </div>
     <AuthenticatedLayout>
         <div class="h-full w-full p-2">
             <section class="border-gray-50 border rounded-lg bg-gray-50">
                 <div class="title-class">
                     Planning Dashboard<br>
                     <span class="text-lg underline">{{ monthName }}</span>
+                    <div id="actions" class="flex justify-end px-4 py-2 text-sm text-gray-700">
+                        <button class="positive-button" @click="showCreateModal = true">
+                            Maak nieuwe reservering
+                        </button>
+                    </div>
+
                 </div>
                 <div id="calendar" class="">
                     <table class="table border-gray-500 border rounded-lg w-full">
