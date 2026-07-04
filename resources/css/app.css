@@ -4,5 +4,14 @@
 
 
 .nav-button {
-    @apply text-gray-200 font-medium hover:text-emerald-700 transition-colors;
+    @apply text-gray-200 font-medium hover:text-emerald-300 transition-colors;
+}
+.title-class {
+    @apply text-2xl text-gray-700 font-medium transition-colors text-center;
+}
+.table-base {
+    @apply border border-gray-200 rounded-md p-2;
+}
+.itemrow:nth-child(2n + 1) {
+    @apply bg-gray-300
 }

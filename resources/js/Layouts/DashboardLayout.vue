@@ -12,26 +12,30 @@ const showingNavigationDropdown = ref(false);
 
 <template>
     <div>
-        <div class="min-h-screen bg-gray-100">
+        <div class="h-screen overflow-hidden bg-gray-100">
+            <div class="flex ">
+
             <nav
-                class="border-b border-gray-100 bg-white"
+                class="border-b border-gray-100 bg-white rounded-r-xl"
             >
                 <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="flex h-16 justify-between">
-                        <div class="flex">
+                <div class="h-screen overflow-hidden w-64">
+                    <div class="flex-col h-16 justify-between">
+
+                        <div class="flex-col">
                             <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
+                            <div class="flex shrink-0 items-center bg-blue-500 gap-2 rounded-r-xl">
                                 <Link :href="route('dashboard')">
                                     <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
+                                        class="block h-9 w-auto fill-current text-gray-200"
                                     />
                                 </Link>
+                                <h1 class="nav-button">Syntec Camping</h1>
                             </div>
 
                             <!-- Navigation Links -->
                             <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                                class="flex-col shrink-0 items-center mt-2 gap-0.5"
                             >
                                 <NavLink
                                     :href="route('dashboard')"
@@ -39,10 +43,17 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    :href="route('home')"
+                                    :active="route().current('home')"
+                                >
+                                    Homepage
+                                </NavLink>
+
                             </div>
                         </div>
 
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center">
+                        <div class="hidden  sm:flex sm:items-center">
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
@@ -179,20 +190,13 @@ const showingNavigationDropdown = ref(false);
                 </div>
             </nav>
 
-            <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
-            >
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
-                </div>
-            </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="flex-1 overflow-y-scroll max-h-screen">
                 <slot />
             </main>
         </div>
+        </div>
+
     </div>
 </template>

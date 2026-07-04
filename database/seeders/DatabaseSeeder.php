@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Arrangement;
 use App\Models\User;
+use Database\Factories\ArrangementFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,5 +23,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+        Arrangement::factory(10)->create();
     }
 }
