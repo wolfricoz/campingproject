@@ -1,15 +1,15 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import {ref, computed, watch} from 'vue';
 
 const props = defineProps({
-    showModal: { type: Boolean, default: false },
-    arrangement: { type: Object, default: null }, // pass when editing, null when creating
+    showModal: {type: Boolean, default: false},
+    arrangement: {type: Object, default: null}, // pass when editing, null when creating
 });
 
 const customers = ref([]);
 const locations = ref([]);
 
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(['close', 'save', 'changeStatus']);
 
 // === Form state ===
 const form = ref({
@@ -34,7 +34,7 @@ const form = ref({
     },
 });
 
-function fetchLocations(){
+function fetchLocations() {
     axios.get(route('api.locations')).then(response => {
         console.log(response);
         locations.value = response.data;
@@ -42,7 +42,8 @@ function fetchLocations(){
         console.log(error);
     })
 }
-function fetchCustomers(){
+
+function fetchCustomers() {
     axios.get(route('api.customers.index')).then(response => {
         customers.value = response.data;
     }).catch(error => {
@@ -50,7 +51,6 @@ function fetchCustomers(){
     })
 
 }
-
 
 
 function toLocalInput(value) {
@@ -83,7 +83,7 @@ watch(() => props.arrangement, (arrangement) => {
             create_account: !!arrangement.customer.user_id,
         };
     }
-}, { immediate: true });
+}, {immediate: true});
 
 // When a customer is picked from the dropdown, copy their details into the editable block
 watch(() => form.value.customer_id, (id) => {
@@ -97,7 +97,7 @@ watch(() => form.value.customer_id, (id) => {
             street_name: '',
             street_number: '',
             postal_code: '',
-            city:  '',
+            city: '',
             country: '',
             create_account: false,
         };
@@ -132,7 +132,7 @@ async function save() {
     try {
 
         const customerRes = await axios.post(route('api.customers.store'), form.value);
-        if (customerRes?.data?.updated_data?.id){
+        if (customerRes?.data?.updated_data?.id) {
             form.value.customer_id = customerRes.data.updated_data.id;
             form.value.customer.id = customerRes.data.updated_data.id;
         }
@@ -141,34 +141,61 @@ async function save() {
         const arrangementRes = await axios.post(route('api.arrangements.store'), form.value);
         form.value.id = arrangementRes.data.updated_data.id; // capture new arrangement id too
 
-        emit('save', { ...form.value });
+        emit('save', {...form.value});
 
     } catch (error) {
         console.log(error);
 
     }
 }
+function changeStatus(status){
+    // As a safety, we will prompt a confirm for certain statusses (eg. cancel)
+    if (status === 'cancelled' || status === 'rejected') {
+        let result = confirm(`Are you sure you want to ${status} this reservation?`)
+        if (!result) {
+            return
+        }
+    }
+
+    // update the status of a post
+    axios.post(route('api.arrangements.status'),{
+        id: form.value.id,
+        status: status,
+    }).then(response => {
+        props.arrangement.booking_status = status;
+    }).catch(error => {
+
+    });
+
+
+    emit('changeStatus', {
+        id: form.value.id,
+        status: status,
+    });
+
+}
+
 fetchLocations();
 fetchCustomers()
 
 
 function splitDate(value) {
-    if (!value) return { date: '', time: '' };
+    if (!value) return {date: '', time: ''};
     const [date, time = ''] = value.split('T');
-    return { date, time: time.slice(0, 5) }; // HH:mm
+    return {date, time: time.slice(0, 5)}; // HH:mm
 }
 
 const startDatePart = computed({
     get: () => splitDate(form.value.start_date).date,
     set: (val) => {
-        const { time } = splitDate(form.value.start_date);
+        const {time} = splitDate(form.value.start_date);
         form.value.start_date = val ? `${val}T${time || '00:00'}` : '';
     }
 });
 const startTimePart = computed({
     get: () => splitDate(form.value.start_date).time,
     set: (val) => {
-        const { date } = splitDate(form.value.start_date);
+        const {date} = splitDate(form.value.start_date);
         form.value.start_date = date ? `${date}T${val || '00:00'}` : '';
     }
 });
@@ -176,18 +203,17 @@ const startTimePart = computed({
 const endDatePart = computed({
     get: () => splitDate(form.value.end_date).date,
     set: (val) => {
-        const { time } = splitDate(form.value.end_date);
+        const {time} = splitDate(form.value.end_date);
         form.value.end_date = val ? `${val}T${time || '00:00'}` : '';
     }
 });
 const endTimePart = computed({
     get: () => splitDate(form.value.end_date).time,
     set: (val) => {
-        const { date } = splitDate(form.value.end_date);
+        const {date} = splitDate(form.value.end_date);
         form.value.end_date = date ? `${date}T${val || '00:00'}` : '';
     }
 });
-
 
 
 </script>
@@ -232,9 +258,9 @@ const endTimePart = computed({
                         <label class="block text-sm font-medium text-gray-700 mb-1">Startdatum</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="startDatePart"
-                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                             <input type="time" v-model="startTimePart" step="60"
-                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                         </div>
                     </div>
 
@@ -242,9 +268,9 @@ const endTimePart = computed({
                         <label class="block text-sm font-medium text-gray-700 mb-1">Einddatum</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="endDatePart"
-                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                             <input type="time" v-model="endTimePart" step="60"
-                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                         </div>
                     </div>
                 </div>
@@ -256,6 +282,18 @@ const endTimePart = computed({
                           :class="form.payment_received ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
                         {{ form.payment_received ? 'Ja' : 'Nee' }}
                     </span>
+                    <span class="text-sm font-medium text-gray-700">Reservering Status:</span>
+                    <span class="text-sm px-2 py-0.5 rounded-full"
+                          :class="{
+        'bg-gray-100 border-gray-400':      arrangement.booking_status === 'pending',
+        'bg-orange-100 border-orange-500':  arrangement.booking_status === 'confirmed',
+        'bg-emerald-100 border-emerald-500': arrangement.booking_status === 'checked-in',
+        'bg-blue-100 border-blue-500':      arrangement.booking_status === 'finished',
+        'bg-red-100 border-red-500':        arrangement.booking_status === 'cancelled',
+        'bg-rose-100 border-rose-500':      arrangement.booking_status === 'rejected',
+    }">
+                        {{ arrangement.booking_status }}
+                    </span>
                 </div>
 
                 <!-- === Location info (read-only) === -->
@@ -266,8 +304,11 @@ const endTimePart = computed({
                         <div><span class="text-gray-500">Type:</span> {{ selectedLocation.type ?? '—' }}</div>
                         <div><span class="text-gray-500">Capaciteit:</span> {{ selectedLocation.capacity ?? '—' }}</div>
                         <div><span class="text-gray-500">Slaapkamers:</span> {{ selectedLocation.bedrooms }}</div>
-                        <div><span class="text-gray-500">Grootte:</span> {{ selectedLocation.size ? selectedLocation.size + ' m²' : '—' }}</div>
-                        <div><span class="text-gray-500">Prijs/nacht:</span> {{ selectedLocation.price_per_night ? '€ ' + selectedLocation.price_per_night : '—' }}</div>
+                        <div><span class="text-gray-500">Grootte:</span> {{ selectedLocation.size ? selectedLocation.size + ' m²' : '—' }}
+                        </div>
+                        <div><span class="text-gray-500">Prijs/nacht:</span>
+                            {{ selectedLocation.price_per_night ? '€ ' + selectedLocation.price_per_night : '—' }}
+                        </div>
                         <div><span class="text-gray-500">Stroom:</span> {{ selectedLocation.has_electricity ? 'Ja' : 'Nee' }}</div>
                         <div><span class="text-gray-500">Water:</span> {{ selectedLocation.has_water ? 'Ja' : 'Nee' }}</div>
                         <div><span class="text-gray-500">Schaduw:</span> {{ selectedLocation.has_shade ? 'Ja' : 'Nee' }}</div>
@@ -285,17 +326,17 @@ const endTimePart = computed({
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Naam</label>
                             <input type="text" v-model="form.customer.name"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
                             <input type="email" v-model="form.customer.email"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Telefoonnummer</label>
                             <input type="tel" v-model="form.customer.phone_number"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                         </div>
                     </div>
 
@@ -304,23 +345,23 @@ const endTimePart = computed({
                         <label class="block text-sm font-medium text-gray-700 mb-1">Adres</label>
                         <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
                             <input type="text" v-model="form.customer.street_name" placeholder="Straat"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                             <input type="text" v-model="form.customer.street_number" placeholder="Nr."
-                                   class="sm:col-span-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="sm:col-span-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                             <input type="text" v-model="form.customer.postal_code" placeholder="Postcode"
-                                   class="sm:col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="sm:col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                             <input type="text" v-model="form.customer.city" placeholder="Plaats"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                             <input type="text" v-model="form.customer.country" placeholder="Land"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500" />
+                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                         </div>
                     </div>
 
                     <!-- Create account checkbox -->
-                    <label class="flex items-center gap-2 mt-4 text-sm text-gray-700"  v-if="!arrangement?.customer.user_id">
+                    <label class="flex items-center gap-2 mt-4 text-sm text-gray-700" v-if="!arrangement?.customer.user_id">
                         <input type="checkbox" v-model="form.customer.create_account"
                                class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                              />
+                        />
                         Account aanmaken voor deze klant
                     </label>
                     <span v-else class="flex items-center gap-2 mt-4 text-sm text-gray-700">
@@ -332,24 +373,49 @@ const endTimePart = computed({
             <!-- Footer -->
             <div class="flex justify-between gap-2 px-6 py-4 border-t border-gray-200">
                 <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
-                    <button v-if="arrangement?.booking_status !== 'checked-in'"
+                    <button v-if="arrangement?.booking_status === 'checked-in'"
                             class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-                            @click="save"
+                            @click="changeStatus('finished')"
                             v-show="props.arrangement"
                     >
-                        check-in
+                        Check-out
+                    </button>
+                    <button v-if="arrangement?.booking_status === 'confirmed' "
+                            class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+                            @click="changeStatus('checked-in')"
+                            v-show="props.arrangement"
+                    >
+                        Check-in
+                    </button>
+
+                    <button v-if="arrangement?.booking_status === 'pending' "
+                            class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+                            @click="changeStatus('confirmed')"
+                            v-show="props.arrangement"
+                    >
+                        Bevestig
+                    </button>
+                    <button v-if="arrangement?.booking_status === 'pending' "
+                            class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700"
+                            @click="changeStatus('rejected')"
+                            v-show="props.arrangement"
+                    >
+                        Afwijzen
                     </button>
                     <button class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700" @click="save">
                         {{ props.arrangement ? 'Bijwerken' : 'Opslaan' }}
                     </button>
-                    <button class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700" @click="save"
-                        v-show="props.arrangement"
+                    <button class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700" @click="changeStatus('cancelled')"
+                            v-show="props.arrangement"
+                            v-if="arrangement?.booking_status !== 'checked-in' && arrangement?.booking_status !== 'finished' &&
+                            arrangement?.booking_status !== 'pending' "
                     >
                         Reservatie Annuleren
                     </button>
                 </div>
                 <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
-                    <button class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50" @click="close">
+                    <button
+                        class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50" @click="close">
                         Annuleren
                     </button>
 

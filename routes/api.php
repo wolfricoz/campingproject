@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::name('arrangements.')->prefix('arrangements')->group(function () {
         Route::get('/', [ArrangementController::class, 'index'])->name('index');
         Route::post('/', [ArrangementController::class, 'store'])->name('store');
+        Route::post('/update/status/', [ArrangementController::class, 'update'])->name('status');
 
     });
 });

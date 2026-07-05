@@ -4,6 +4,7 @@ import {Head} from '@inertiajs/vue3';
 import ArrangementCard from "@/Components/calendar/ArrangementCard.vue";
 import {computed, ref} from "vue";
 import ArrangementModal from "@/Components/calendar/ArrangementModal.vue";
+import ArrangementListItem from "@/Components/calendar/ArrangementListItem.vue";
 
 const props = defineProps({
     arrangements: {
@@ -125,76 +126,22 @@ const showCreateModal = ref(false);
 </script>
 
 <template>
-    <Head title="Dashboard"/>
+    <Head title="Alle Reserveringen"/>
     <div v-if="showCreateModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20" >
         <arrangement-modal :show-modal="showCreateModal" @close="showCreateModal = false" @save="onSave">
 
         </arrangement-modal>
     </div>
     <AuthenticatedLayout>
-        <div class="h-full w-full p-2">
+        <div class="h-full w-full p-2 ">
             <section class="border-gray-50 border rounded-lg bg-gray-50">
-                <div class="title-class">
-                    Planning Dashboard<br>
-                    <span class="text-lg underline">{{ monthName }}</span>
-                    <div id="actions" class="flex justify-end px-4 py-2 text-sm text-gray-700">
-                        <button class="positive-button" @click="showCreateModal = true" @change-status="onChangeStatus">
-                            Maak nieuwe reservering
-                        </button>
-                    </div>
-
+                <div class="w-full">
+                    <h1 class="text-2xl font-bold text-center">Alle Reserveringen</h1>
                 </div>
-                <div id="calendar" class="">
-                    <table class="table border-gray-500 border rounded-lg w-full">
-                        <thead>
-                        <tr>
-                            <th class="table-base">
-                                Maandag
-                            </th>
-                            <th class="table-base">
-                                Dinsdag
-                            </th>
-                            <th class="table-base">
-                                Woensdag
-                            </th>
-                            <th class="table-base">
-                                Donderdag
-                            </th>
-                            <th class="table-base">
-                                Vrijdag
-                            </th>
-                            <th class="table-base">
-                                Zaterdag
-                            </th>
-                            <th class="table-base">
-                                Zondag
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="(week, weekKey) in days" :key="weekKey">
-                            <td v-for="col in 7" :key="col" class="table-base align-top"
-                                :class="{
-                                    'bg-gray-500': !week[col - 1],
-                                    'bg-gray-200 itemrow': week[col - 1]
-                                }"
-                            >
-                                <template v-if="week[col - 1]">
-                                    <div class="flex flex-col gap-1.5 cursor-pointer">
-                                        <div class="flex items-center justify-between text-gray-700 border-b border-gray-500 pb-1 mb-0.5">
-                                            <span class="text-sm font-semibold">{{ week[col - 1].date.getDate() }}</span>
-                                        </div>
-                                        <ArrangementCard v-for="a in week[col - 1].arrangements" :key="a.id" :arrangement="a"
-                                                         @save="onSave" @change-status="onChangeStatus">
-                                        </ArrangementCard>
+                <div class="gap-2 flex flex-col p-6">
+                    <ArrangementListItem v-for="arrangement in arrangements" :key="arrangement.id"  :arrangement="arrangement">
 
-
-                                    </div>
-                                </template>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    </ArrangementListItem>
                 </div>
             </section>
 

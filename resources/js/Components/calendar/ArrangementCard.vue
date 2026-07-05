@@ -3,7 +3,7 @@ import {ref} from "vue";
 import arrangementModal from "@/Components/calendar/arrangementModal.vue";
 
 
-const emit = defineEmits(['save']);
+const emit = defineEmits(['save', 'changeStatus']);
 
 const props = defineProps({
     arrangement: {
@@ -37,6 +37,10 @@ function onSave(data){
     showModal.value = false;
 
 }
+function onChangeStatus(data){
+    arrangement.status = data.status;
+    emit('changeStatus', { ...data });
+}
 
 let showModal = ref(false);
 
@@ -57,10 +61,14 @@ function formatDate(date) {
     <div
         class="rounded-lg px-2 py-1 text-center shadow-sm border-l-4 transition-colors hover:brightness-95"
         :class="{
-            'bg-emerald-100 border-emerald-500': arrangement.booking_status === 'checked-in' && arrangement.payment_received,
-            'bg-orange-100 border-orange-500': arrangement.booking_status === 'confirmed' && arrangement.payment_received,
-            'bg-red-100 border-red-500': !arrangement.payment_received
-        }"
+        'bg-gray-100 border-gray-400':      arrangement.booking_status === 'pending',
+        'bg-orange-100 border-orange-500':  arrangement.booking_status === 'confirmed',
+        'bg-emerald-100 border-emerald-500': arrangement.booking_status === 'checked-in',
+        // Finished, cancelled and rejected records are hidden, but just incase I've added it here - if they show up we can easily spot them
+        'bg-blue-100 border-blue-500':      arrangement.booking_status === 'finished',
+        'bg-red-100 border-red-500':        arrangement.booking_status === 'cancelled',
+        'bg-red-100 border-rose-500':      arrangement.booking_status === 'rejected',
+    }"
         @click="showModal = true"
     >
         <h3 class="truncate whitespace-nowrap w-full text-sm font-medium text-gray-800">
@@ -72,7 +80,7 @@ function formatDate(date) {
         </div>
     </div>
     <div v-if="showModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20" >
-        <arrangement-modal :arrangement="arrangement" :show-modal="showModal" @close="showModal = false" @save="onSave">
+        <arrangement-modal :arrangement="arrangement" :show-modal="showModal" @close="showModal = false" @save="onSave" @change-status="onChangeStatus">
 
         </arrangement-modal>
     </div>

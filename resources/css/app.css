@@ -15,6 +15,11 @@
 .positive-button {
     @apply px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700;
 }
+
+.general-button {
+    @apply px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700;
+}
+
 .negative-button {
     @apply px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700;
 }

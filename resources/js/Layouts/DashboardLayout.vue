@@ -49,6 +49,18 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Homepage
                                 </NavLink>
+                                <NavLink
+                                    :href="route('arrangement.index')"
+                                    :active="route().current('arrangement.index') && !route().params.status"
+                                >
+                                    Alle reserveringen
+                                </NavLink>
+                                <NavLink
+                                    :href="route('arrangement.index', 'pending')"
+                                    :active="route().current('arrangement.index') && route().params.status === 'pending'"
+                                >
+                                    in behandeling reserveringen
+                                </NavLink>
 
                             </div>
                         </div>

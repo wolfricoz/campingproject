@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ArrangementStatus;
 use App\Models\Arrangement;
 use Carbon\Carbon;
 use DateTime;
@@ -23,11 +24,13 @@ class DashboardController extends Controller
 
         // We fetch the arrangements for the current month.
         $arrangements = Arrangement::with('customer', 'location')
-            ->where('start_date', '>=', $start)
             ->where(function (Builder $query) use ($start, $end) {
                 $query->whereBetween('start_date', [$start, $end])
                     ->orWhereBetween('end_date', [$start, $end]);
-            })->where('booking_status','!=', 'cancelled')->get();
+            })->whereIn('booking_status', [ArrangementStatus::CONFIRMED, ArrangementStatus::CHECKEDIN,
+                ArrangementStatus::PENDING, ArrangementStatus::FINISHED])
+            ->where('status', '=',1)
+            ->get();
 
 
 
