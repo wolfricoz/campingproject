@@ -19,6 +19,13 @@ class DashboardController extends Controller
      */
     public function index(Request $request, DateTime $month = null){
         // Set the dates for the beginning and end of the month
+
+        if(!auth()->user()->hasPermissionTo('access dashboard')){
+            return Inertia::render('Dashboard/Customer', [
+
+            ]);
+        }
+
         $start = Carbon::now()->startOfMonth();
         $end = Carbon::now()->endOfMonth();
 

@@ -224,7 +224,6 @@ const endTimePart = computed({
          @click.self="close"
     >
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                 <h2 class="text-lg font-semibold text-gray-800">
                     {{ arrangement ? 'Reservering bewerken' : 'Nieuwe reservering' }}
@@ -236,9 +235,11 @@ const endTimePart = computed({
                 <!-- === Booking fields === -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Klant</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* Klant</label>
                         <select v-model="form.customer_id"
-                                class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                                class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                required
+                        >
                             <option :value="null">— Selecteer klant —</option>
                             <option :value="0">Nieuwe Klant</option>
                             <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
@@ -246,31 +247,41 @@ const endTimePart = computed({
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Locatie</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* Locatie</label>
                         <select v-model="form.location_id"
-                                class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                                class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                required
+                        >
                             <option :value="null">— Selecteer locatie —</option>
                             <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Startdatum</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* Startdatum</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="startDatePart"
-                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                             <input type="time" v-model="startTimePart" step="60"
-                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Einddatum</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* Einddatum</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="endDatePart"
-                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                             <input type="time" v-model="endTimePart" step="60"
-                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                         </div>
                     </div>
                 </div>
@@ -295,10 +306,9 @@ const endTimePart = computed({
                         {{ arrangement.booking_status }}
                     </span>
                 </div>
-
-                <!-- === Location info (read-only) === -->
+<!--            === Locatie gegevens ===    -->
                 <div class="border border-gray-200 rounded-xl p-4 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Locatiegegevens</h3>
+                    <h3 class="text-sm font-semibold text-gray-800 mb-3">* Locatiegegevens</h3>
                     <div v-if="selectedLocation" class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm">
                         <div><span class="text-gray-500">Naam:</span> {{ selectedLocation.name }}</div>
                         <div><span class="text-gray-500">Type:</span> {{ selectedLocation.type ?? '—' }}</div>
@@ -319,45 +329,62 @@ const endTimePart = computed({
                     <p v-else class="text-sm text-gray-400">Selecteer een locatie om de gegevens te zien.</p>
                 </div>
 
-                <!-- === Customer info (editable) === -->
+                <!--            === Klant gegevens ===    -->
                 <div class="border border-gray-200 rounded-xl p-4">
                     <h3 class="text-sm font-semibold text-gray-800 mb-3">Klantgegevens</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Naam</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">* Naam</label>
                             <input type="text" v-model="form.customer.name"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+
+                            />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">* E-mail</label>
                             <input type="email" v-model="form.customer.email"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+
+                            />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Telefoonnummer</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">* Telefoonnummer</label>
                             <input type="tel" v-model="form.customer.phone_number"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+
+                            />
                         </div>
                     </div>
 
-                    <!-- Address combination -->
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Adres</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* Adres</label>
                         <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
                             <input type="text" v-model="form.customer.street_name" placeholder="Straat"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                             <input type="text" v-model="form.customer.street_number" placeholder="Nr."
-                                   class="sm:col-span-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="sm:col-span-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                             <input type="text" v-model="form.customer.postal_code" placeholder="Postcode"
-                                   class="sm:col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="sm:col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                             <input type="text" v-model="form.customer.city" placeholder="Plaats"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                             <input type="text" v-model="form.customer.country" placeholder="Land"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   required
+                            />
                         </div>
                     </div>
 
-                    <!-- Create account checkbox -->
                     <label class="flex items-center gap-2 mt-4 text-sm text-gray-700" v-if="!arrangement?.customer.user_id">
                         <input type="checkbox" v-model="form.customer.create_account"
                                class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
@@ -370,7 +397,6 @@ const endTimePart = computed({
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="flex justify-between gap-2 px-6 py-4 border-t border-gray-200">
                 <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
                     <button v-if="arrangement?.booking_status === 'checked-in'"

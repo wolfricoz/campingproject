@@ -15,6 +15,7 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::name('customers.')->prefix('arrangements')->group(function () {
         Route::get('/customers', [CustomerController::class, 'index'])->name('index');
         Route::post('/customers', [CustomerController::class, 'store'])->name('store');
+        Route::get('/customers/{id}', [CustomerController::class, 'find'])->name('find');
 
     });
 

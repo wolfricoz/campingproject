@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ArrangementController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
@@ -14,7 +15,8 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
     ]);
 })->name('home');
-Route::get('/booking', [BookingController::class, 'index'])->name('booking');
+Route::get('/booking', [BookingController::class, 'index'])->middleware('auth')->name('booking');
+Route::get('/payment/{guid}', [PaymentController::class, 'index'])->middleware('auth')->name('payment');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::middleware(['auth', 'verified'])->group(function () {

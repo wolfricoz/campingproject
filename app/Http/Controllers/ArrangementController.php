@@ -67,9 +67,12 @@ class ArrangementController extends Controller
         if ($data['id'] === 0) {
             unset($data['id']);
             $result = Arrangement::create($data);
+            $data['id'] = $result->id;
         } else {
-            $result = Arrangement::updateOrCreate(['id' => $data['id']], $data);
+            Arrangement::updateOrCreate(['id' => $data['id']], $data);
         }
+
+        $result = Arrangement::find($data['id']);
 
         return response()->json(['status' => "success!", 'updated_data' => $result]);
 

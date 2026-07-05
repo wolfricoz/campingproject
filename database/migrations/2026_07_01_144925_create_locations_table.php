@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
+            $table->uuid('guid')->unique()->default(DB::raw('gen_random_uuid()'));
 
             $table->string('name');
             $table->string('type')->nullable(); // e.g. tent pitch, caravan pitch, cabin, RV spot

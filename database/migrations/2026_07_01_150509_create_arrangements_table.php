@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('arrangements', function (Blueprint $table) {
             $table->id();
+            $table->uuid('guid')->unique()->default(DB::raw('gen_random_uuid()'));
             $table->timestamps();
             $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete();
             $table->foreignId('location_id')->constrained('locations')->cascadeOnDelete();

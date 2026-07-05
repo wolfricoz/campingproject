@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->uuid('guid')->unique()->default(DB::raw('gen_random_uuid()'));
             $table->timestamps();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('phone_number');
-            $table->string('street_name')->nullable();
-            $table->string('street_number')->nullable();
-            $table->string('postal_code')->nullable();
-            $table->string('city')->nullable();
-            $table->string('country')->nullable();
+            $table->string('street_name');
+            $table->string('street_number');
+            $table->string('postal_code');
+            $table->string('city');
+            $table->string('country');
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->integer('status')->default(1); // 1 = active, 2 = inactive, 3 = archive
         });
