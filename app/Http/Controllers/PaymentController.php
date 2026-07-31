@@ -21,9 +21,10 @@ class PaymentController extends Controller
         $arrangement = Arrangement::where('guid', $guid)->get()->first();
         // Prevent the user from paying twice; while we'd love to get paid multiple times.. this would be a legal
         // problem.
-        if ($arrangement->payment_received) {
-            return redirect()->route('dashboard');
-        }
+//        if ($arrangement->payment_received) {
+
+//            return redirect()->route('dashboard');
+//        }
 
         return Inertia::render('payment', [
             'canLogin' => (Route::has('login') && ! auth()->check()),

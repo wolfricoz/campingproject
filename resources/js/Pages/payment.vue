@@ -57,7 +57,7 @@ function submit() {
                     </div>
                     <div v-else class="border-t border-gray-100 pt-6">
                         <div class="p-10 w-full bg-orange-100 rounded-xl border-2 border-dashed border-orange-400 text-center">
-                            De booking is al betaald of is verlopen!<br>
+                            De booking is al betaald!<br>
                             <Link :href="route('dashboard')" class="href-class">Ga terug naar Dashboard</Link>
                         </div>
                     </div>

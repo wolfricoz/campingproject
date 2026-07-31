@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Arrangement;
 use App\Models\Customer;
 use App\Models\Location;
+use App\Services\daysCalculator;
+use App\Services\PriceCalculator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -62,8 +64,18 @@ class BookingController extends Controller
             'end_date' => 'required|date',
         ]);
 
+        // TODO: Calculate price
+        $days = (new daysCalculator())
+            ->setStart($arrangementData['start_date'])
+            ->setEnd($arrangementData['end_date'])
+            ->calculate();
+
+        $arrangementData['price_per_night'] = (new PriceCalculator())->setLocation($arrangementData['location_id'])->setDays
+        ($days)
+            ->calculate();
+
         // Attempt to update the data, if the id is not found create a new record
-        $arrangementResult['customer_id'] = $customerResult->id;
+        $arrangementData['customer_id'] = $customerResult->id;
         $result = Arrangement::create($arrangementData);
         $arrangementData['id'] = $result->id;
 
