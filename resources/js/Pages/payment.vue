@@ -1,40 +1,34 @@
 <script setup>
-import {Head, Link} from '@inertiajs/vue3';
+import {Head, Link, useForm} from '@inertiajs/vue3';
 import {ref, watch} from 'vue';
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 
-defineProps({
-    locations: {
-        type: Object,
-    },
+const props = defineProps({
     canLogin: {
         type: Boolean,
     },
     canRegister: {
         type: Boolean,
     },
-});
-
-
-const form = ref({
-    location_id: null,
-    start_date: '',
-    end_date: '',
-    customer: {
-        id: 0,
-        name: '',
-        email: '',
-        phone_number: '',
-        street_name: '',
-        street_number: '',
-        postal_code: '',
-        city: '',
-        country: '',
+    paid: {
+        type: Boolean,
     },
+    guid: {
+        type: String
+    }
 });
+
+const form = useForm(
+    'POST',
+    route('payment.complete'),
+    {
+        guid: props.guid,
+    }
+);
 
 function submit() {
-    // Wire this up yourself — form.value holds everything
+    form.post(route('payment.complete'));
+
 }
 
 
@@ -55,15 +49,21 @@ function submit() {
                         Deze pagina is om de betaling te simuleren, in productie zal hier een payment provider voor worden gebruikt.
                     </p>
 
-                        <div class="border-t border-gray-100 pt-6">
-                            <button type="button" @click="submit"
-                                    class="w-full rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 sm:w-auto">
-                                Betaal
-                            </button>
+                    <div v-if="!paid" class="border-t border-gray-100 pt-6">
+                        <Link type="button" @click="submit"
+                              class="w-full rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 sm:w-auto">
+                            Betaal
+                        </Link>
+                    </div>
+                    <div v-else class="border-t border-gray-100 pt-6">
+                        <div class="p-10 w-full bg-orange-100 rounded-xl border-2 border-dashed border-orange-400 text-center">
+                            De booking is al betaald of is verlopen!<br>
+                            <Link :href="route('dashboard')" class="href-class">Ga terug naar Dashboard</Link>
                         </div>
                     </div>
                 </div>
-
             </div>
+
+        </div>
     </GuestLayout>
 </template>

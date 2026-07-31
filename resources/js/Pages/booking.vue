@@ -1,7 +1,8 @@
 <script setup>
-import {Head, Link} from '@inertiajs/vue3';
-import {ref, watch} from 'vue';
+import {Head, Link, useForm} from '@inertiajs/vue3';
+import {computed, ref, watch} from 'vue';
 import GuestLayout from "@/Layouts/GuestLayout.vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 const props = defineProps({
     customer: {
@@ -19,7 +20,7 @@ const props = defineProps({
 });
 
 
-const form = ref({
+const form = useForm({
     id: 0,
     location_id: null,
     customer_id: null,
@@ -37,6 +38,7 @@ const form = ref({
         country: '',
         create_account: true
     },
+    terms_accepted: false
 });
 
 watch(
@@ -61,26 +63,30 @@ watch(
 );
 
 
-async function submit() {
-    try {
-        const customerRes = await axios.post(route('api.customers.store'), form.value);
+const hasErrors = computed(() => Object.keys(form.errors).length > 0);
 
-        const customerId = customerRes?.data?.updated_data?.id;
-        if (!customerId) {
-            console.error('No customer id returned', customerRes);
-            return; // stop — don't create an arrangement without a customer
-        }
+function submit() {
+    form.post(route('booking.store'));
 
-        form.value.customer_id = customerId;
-        form.value.customer.id = customerId;
-
-        const arrangementRes = await axios.post(route('api.arrangements.store'), form.value);
-        form.value.id = arrangementRes.data.updated_data.id;
-        console.log(arrangementRes);
-        window.location.href = route('payment', arrangementRes.data.updated_data.guid);
-    } catch (error) {
-        console.log(error);
-    }
+    // try {
+    //     const customerRes = await axios.post(route('api.customers.store'), form.value);
+    //
+    //     const customerId = customerRes?.data?.updated_data?.id;
+    //     if (!customerId) {
+    //         console.error('No customer id returned', customerRes);
+    //         return; // stop — don't create an arrangement without a customer
+    //     }
+    //
+    //     form.value.customer_id = customerId;
+    //     form.value.customer.id = customerId;
+    //
+    //     const arrangementRes = await axios.post(route('api.arrangements.store'), form.value);
+    //     form.value.id = arrangementRes.data.updated_data.id;
+    //     console.log(arrangementRes);
+    //     window.location.href = route('payment', arrangementRes.data.updated_data.guid);
+    // } catch (error) {
+    //     console.log(error);
+    // }
 }
 
 
@@ -97,27 +103,39 @@ async function submit() {
                     <h2 class="text-xl font-semibold text-gray-800">Reservering aanvragen</h2>
                     <p class="mt-1 text-sm text-gray-500">Vul je gegevens in en kies een locatie.</p>
 
+                    <!-- Algemene foutmelding wanneer er validatiefouten zijn -->
+                    <div v-if="hasErrors"
+                         class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        <p class="font-medium">Er ging iets mis. Controleer de gemarkeerde velden:</p>
+                        <ul class="mt-1 list-inside list-disc">
+                            <li v-for="(message, field) in form.errors" :key="field">{{ message }}</li>
+                        </ul>
+                    </div>
+
                     <div class="mt-6 space-y-6">
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div class="sm:col-span-3">
-                                <label class="mb-1 block text-sm font-medium text-gray-700">Locatie</label>
+                                <label class="mb-1 block text-sm font-medium text-gray-700">Locatie <span class="text-red-600">*</span></label>
                                 <select v-model="form.location_id"
                                         class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
                                     <option :value="null">— Selecteer een locatie —</option>
                                     <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
                                 </select>
+                                <p v-if="form.errors.location_id" class="mt-1 text-xs text-red-600">{{ form.errors.location_id }}</p>
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-gray-700">Aankomst</label>
+                                <label class="mb-1 block text-sm font-medium text-gray-700">Aankomst <span class="text-red-600">*</span></label>
                                 <input type="date" v-model="form.start_date"
                                        class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                <p v-if="form.errors.start_date" class="mt-1 text-xs text-red-600">{{ form.errors.start_date }}</p>
                             </div>
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-gray-700">Vertrek</label>
+                                <label class="mb-1 block text-sm font-medium text-gray-700">Vertrek <span class="text-red-600">*</span></label>
                                 <input type="date" v-model="form.end_date"
                                        class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                <p v-if="form.errors.end_date" class="mt-1 text-xs text-red-600">{{ form.errors.end_date }}</p>
                             </div>
                         </div>
 
@@ -126,19 +144,22 @@ async function submit() {
                             <h3 class="mb-3 text-sm font-semibold text-gray-800">Jouw gegevens</h3>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">Naam</label>
+                                    <label class="mb-1 block text-sm font-medium text-gray-700">Naam <span class="text-red-600">*</span></label>
                                     <input type="text" v-model="form.customer.name" placeholder="Volledige naam"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.name']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.name'] }}</p>
                                 </div>
                                 <div>
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">E-mail</label>
+                                    <label class="mb-1 block text-sm font-medium text-gray-700">E-mail <span class="text-red-600">*</span></label>
                                     <input type="email" v-model="form.customer.email" placeholder="naam@voorbeeld.nl"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.email']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.email'] }}</p>
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="mb-1 block text-sm font-medium text-gray-700">Telefoonnummer</label>
                                     <input type="tel" v-model="form.customer.phone_number" placeholder="06 12345678"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.phone_number']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.phone_number'] }}</p>
                                 </div>
                             </div>
                         </div>
@@ -146,22 +167,62 @@ async function submit() {
                         <div class="border-t border-gray-100 pt-6">
                             <h3 class="mb-3 text-sm font-semibold text-gray-800">Adres</h3>
                             <div class="grid grid-cols-2 gap-3 sm:grid-cols-6">
-                                <input type="text" v-model="form.customer.street_name" placeholder="Straat"
-                                       class="col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500 sm:col-span-3"/>
-                                <input type="text" v-model="form.customer.street_number" placeholder="Nr."
-                                       class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500 sm:col-span-1"/>
-                                <input type="text" v-model="form.customer.postal_code" placeholder="Postcode"
-                                       class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500 sm:col-span-2"/>
-                                <input type="text" v-model="form.customer.city" placeholder="Plaats"
-                                       class="col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500 sm:col-span-3"/>
-                                <input type="text" v-model="form.customer.country" placeholder="Land"
-                                       class="col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500 sm:col-span-3"/>
+                                <div class="col-span-2 sm:col-span-3">
+                                    <input type="text" v-model="form.customer.street_name" placeholder="Straat"
+                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.street_name']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.street_name'] }}</p>
+                                </div>
+                                <div class="sm:col-span-1">
+                                    <input type="text" v-model="form.customer.street_number" placeholder="Nr."
+                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.street_number']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.street_number'] }}</p>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <input type="text" v-model="form.customer.postal_code" placeholder="Postcode"
+                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.postal_code']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.postal_code'] }}</p>
+                                </div>
+                                <div class="col-span-2 sm:col-span-3">
+                                    <input type="text" v-model="form.customer.city" placeholder="Plaats"
+                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.city']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.city'] }}</p>
+                                </div>
+                                <div class="col-span-2 sm:col-span-3">
+                                    <input type="text" v-model="form.customer.country" placeholder="Land"
+                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <p v-if="form.errors['customer.country']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.country'] }}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="border-t border-gray-100 pt-6">
-                            <button type="button" @click="submit"
-                                    class="w-full rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 sm:w-auto">
+                        <!-- Account Aanmaken optie -->
+                        <div class="flex-col gap-2  border-t border-gray-100 pt-6">
+                            <div class="flex text-xs text-gray-800 gap-2">
+                                <p>Maak een account aan en bekijk je boeking wanneer je maar wilt.</p>
+                                <checkbox :checked="false" v-model="form.customer.create_account">
+
+                                </checkbox>
+                            </div>
+                            <div class="flex text-xs text-gray-800 gap-2">
+
+                                <p>Door je account aan te maken ga je akkoord met onze <Link class="href-class" href="/voorwaarden">algemene
+                                    voorwaarden</Link> en
+                                    <Link class="href-class" href="/privacy">privacyverklaring</Link>. <span class="text-red-600">*</span></p>
+                                <checkbox :checked="false" v-model="form.terms_accepted">
+
+                                </checkbox>
+                            </div>
+                            <p v-if="form.errors.terms_accepted" class="mt-1 text-xs text-red-600">{{ form.errors.terms_accepted }}</p>
+                            <p v-if="form.errors['customer.create_account']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.create_account'] }}</p>
+                            <p v-if="form.errors.customer_id" class="mt-1 text-xs text-red-600">{{ form.errors.customer_id }}</p>
+
+                        </div>
+
+
+                        <div class="flex flex-col border-t border-gray-100 pt-6">
+
+                            <button :disabled="!form.terms_accepted" type="button" @click="submit"
+                                    class="w-full positive-button">
                                 Reservering aanvragen
                             </button>
                         </div>
