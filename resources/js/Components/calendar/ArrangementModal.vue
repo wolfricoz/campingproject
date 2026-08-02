@@ -215,6 +215,50 @@ const endTimePart = computed({
     }
 });
 
+// De einddatum mag nooit voor de startdatum liggen, dus we schuiven hem mee.
+watch(() => form.value.start_date, () => {
+    if (form.value.end_date && form.value.end_date < form.value.start_date) {
+        form.value.end_date = form.value.start_date;
+    }
+});
+
+// === Nachten & prijs ===
+const days = ref(0);
+const price = ref(0);
+
+function fetchDays() {
+    if (!form.value.start_date || !form.value.end_date) {
+        days.value = 0;
+        return;
+    }
+    axios.get(route('api.calculations.days'), {
+        params: {start_date: form.value.start_date, end_date: form.value.end_date},
+    }).then(response => {
+        days.value = response.data.days;
+    }).catch(error => {
+        days.value = 0;
+        console.log(error);
+    });
+}
+
+function fetchPrice() {
+    if (!form.value.location_id || !days.value) {
+        price.value = 0;
+        return;
+    }
+    axios.get(route('api.calculations.price'), {
+        params: {location_id: form.value.location_id, days: days.value},
+    }).then(response => {
+        price.value = response.data.price;
+    }).catch(error => {
+        price.value = 0;
+        console.log(error);
+    });
+}
+
+watch(() => [form.value.start_date, form.value.end_date], fetchDays, {immediate: true});
+watch(() => [form.value.location_id, days.value], fetchPrice);
+
 
 </script>
 
@@ -274,7 +318,7 @@ const endTimePart = computed({
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">* Einddatum</label>
                         <div class="flex gap-2">
-                            <input type="date" v-model="endDatePart"
+                            <input type="date" v-model="endDatePart" :min="startDatePart"
                                    class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
                             />
@@ -284,6 +328,12 @@ const endTimePart = computed({
                             />
                         </div>
                     </div>
+                </div>
+
+                <!-- Berekende nachten en prijs -->
+                <div class="flex items-center justify-between rounded-lg bg-emerald-50 px-4 py-3 text-sm">
+                    <span class="text-gray-700">{{ days }} {{ days === 1 ? 'nacht' : 'nachten' }}</span>
+                    <span class="font-semibold text-emerald-700">€ {{ price }}</span>
                 </div>
 
                 <!-- Payment received (read-only) -->

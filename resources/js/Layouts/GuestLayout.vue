@@ -1,5 +1,9 @@
 <script setup>
 import {Head, Link} from '@inertiajs/vue3';
+import Dropdown from "@/Components/Dropdown.vue";
+import {usePage} from '@inertiajs/vue3';
+import {computed} from "vue";
+import DropdownLink from "@/Components/DropdownLink.vue";
 
 defineProps({
     canLogin: {
@@ -8,7 +12,11 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
+
 });
+
+
+const user = computed(() => usePage().props.auth.user);
 
 function handleImageError() {
     document.getElementById('screenshot-container')?.classList.add('!hidden');
@@ -40,9 +48,38 @@ function handleImageError() {
                         <Link v-if="canLogin" :href="route('login')" class="nav-button">
                             Login
                         </Link>
-                        <Link v-else class="nav-button" :href="route('login')" >
-                            Dashboard
-                        </Link>
+                        <Dropdown align="middle" width="48">
+                            <template #trigger>
+                                        <span class="inline-flex rounded-md">
+                                            <button
+                                                type="button"
+                                                class="nav-button"
+                                            >
+                                                {{ $page.props.auth.user.name }}
+
+
+                                            </button>
+                                        </span>
+                            </template>
+
+                            <template #content>
+                                <dropdownLink :href="route('dashboard')">
+                                    Dashboard
+                                </dropdownLink>
+                                <DropdownLink
+                                    :href="route('profile.edit')"
+                                >
+                                    Profile
+                                </DropdownLink>
+                                <DropdownLink
+                                    :href="route('logout')"
+                                    method="post"
+                                    as="button"
+                                >
+                                    Log Out
+                                </DropdownLink>
+                            </template>
+                        </Dropdown>
                     </div>
                 </div>
             </div>

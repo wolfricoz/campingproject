@@ -1,14 +1,9 @@
 <?php
 
 use App\Http\Controllers\ArrangementController;
-use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LocationController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::get('/locations', [LocationController::class, 'index'])->name('locations');
@@ -27,5 +22,9 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     });
 });
 
+// The public booking page needs these to show the amount of nights and the price, so they run without auth.
+Route::name('api.calculations.')->prefix('calculations')->withoutMiddleware('auth:sanctum')->group(function () {
+    Route::get('/days', [ArrangementController::class, 'calculateDays'])->name('days');
+    Route::get('/price', [ArrangementController::class, 'calculatePrice'])->name('price');
 
-
+});

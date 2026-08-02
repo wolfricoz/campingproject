@@ -15,13 +15,21 @@ class DashboardController extends Controller
 {
     /**
      * Returns the main page of the dashboard, including the data for the calendar
+     *
      * @return Response
      */
-    public function index(Request $request, DateTime $month = null){
+    public function index(Request $request, ?DateTime $month = null)
+    {
         // Set the dates for the beginning and end of the month
 
-        if(!auth()->user()->hasPermissionTo('access dashboard')){
+        if (! auth()->user()->hasPermissionTo('access dashboard')) {
+            $reservations = Arrangement::with('location')
+                ->where('customer_id', auth()->user()->customer->id)
+                ->orderByDesc('created_at')
+                ->get();
+
             return Inertia::render('Dashboard/Customer', [
+                'reservations' => $reservations,
 
             ]);
         }
@@ -36,12 +44,10 @@ class DashboardController extends Controller
                     ->orWhereBetween('end_date', [$start, $end]);
             })->whereIn('booking_status', [ArrangementStatus::CONFIRMED, ArrangementStatus::CHECKEDIN,
                 ArrangementStatus::PENDING, ArrangementStatus::FINISHED])
-            ->where('status', '=',1)
+            ->where('status', '=', 1)
             ->get();
 
-
-
-        //dd($arrangements);
+        // dd($arrangements);
         return Inertia::render('Dashboard', [
             'arrangements' => $arrangements,
         ]);

@@ -45,8 +45,8 @@ watch(
     () => props.customer,
     (customer) => {
         if (!customer) return;
-        form.value.customer_id = customer.id ?? null;
-        form.value.customer = {
+        form.customer_id = customer.id ?? null;
+        form.customer = {
             id: customer.id ?? 0,
             name: customer.name ?? '',
             email: customer.email ?? '',
@@ -63,7 +63,87 @@ watch(
 );
 
 
+function splitDate(value) {
+    if (!value) return {date: '', time: ''};
+    const [date, time = ''] = value.split('T');
+    return {date, time: time.slice(0, 5)}; // HH:mm
+}
+
+const startDatePart = computed({
+    get: () => splitDate(form.start_date).date,
+    set: (val) => {
+        const {time} = splitDate(form.start_date);
+        form.start_date = val ? `${val}T${time || '00:00'}` : '';
+    }
+});
+const startTimePart = computed({
+    get: () => splitDate(form.start_date).time,
+    set: (val) => {
+        const {date} = splitDate(form.start_date);
+        form.start_date = date ? `${date}T${val || '00:00'}` : '';
+    }
+});
+
+const endDatePart = computed({
+    get: () => splitDate(form.end_date).date,
+    set: (val) => {
+        const {time} = splitDate(form.end_date);
+        form.end_date = val ? `${val}T${time || '00:00'}` : '';
+    }
+});
+const endTimePart = computed({
+    get: () => splitDate(form.end_date).time,
+    set: (val) => {
+        const {date} = splitDate(form.end_date);
+        form.end_date = date ? `${date}T${val || '00:00'}` : '';
+    }
+});
+
 const hasErrors = computed(() => Object.keys(form.errors).length > 0);
+
+// De einddatum mag nooit voor de startdatum liggen, dus we schuiven hem mee.
+watch(() => form.start_date, () => {
+    if (form.end_date && form.end_date < form.start_date) {
+        form.end_date = form.start_date;
+    }
+});
+
+// === Nachten & prijs ===
+const days = ref(0);
+const price = ref(0);
+
+function fetchDays() {
+    if (!form.start_date || !form.end_date) {
+        days.value = 0;
+        return;
+    }
+    axios.get(route('api.calculations.days'), {
+        params: {start_date: form.start_date, end_date: form.end_date},
+    }).then(response => {
+        days.value = response.data.days;
+    }).catch(error => {
+        days.value = 0;
+        console.log(error);
+    });
+}
+
+function fetchPrice() {
+    if (!form.location_id || !days.value) {
+        price.value = 0;
+        return;
+    }
+    axios.get(route('api.calculations.price'), {
+        params: {location_id: form.location_id, days: days.value},
+    }).then(response => {
+        price.value = response.data.price;
+    }).catch(error => {
+        price.value = 0;
+        console.log(error);
+    });
+}
+
+watch(() => [form.start_date, form.end_date], fetchDays, {immediate: true});
+watch(() => [form.location_id, days.value], fetchPrice);
 
 function submit() {
     form.post(route('booking.store'));
@@ -127,16 +207,30 @@ function submit() {
 
                             <div>
                                 <label class="mb-1 block text-sm font-medium text-gray-700">Aankomst <span class="text-red-600">*</span></label>
-                                <input type="date" v-model="form.start_date"
-                                       class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                <div class="flex gap-2">
+                                    <input type="date" v-model="startDatePart"
+                                           class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <input type="time" v-model="startTimePart" step="60"
+                                           class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                </div>
                                 <p v-if="form.errors.start_date" class="mt-1 text-xs text-red-600">{{ form.errors.start_date }}</p>
                             </div>
                             <div>
                                 <label class="mb-1 block text-sm font-medium text-gray-700">Vertrek <span class="text-red-600">*</span></label>
-                                <input type="date" v-model="form.end_date"
-                                       class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                <div class="flex gap-2">
+                                    <input type="date" v-model="endDatePart" :min="startDatePart"
+                                           class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                    <input type="time" v-model="endTimePart" step="60"
+                                           class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                </div>
                                 <p v-if="form.errors.end_date" class="mt-1 text-xs text-red-600">{{ form.errors.end_date }}</p>
                             </div>
+                        </div>
+
+                        <!-- Berekende nachten en prijs -->
+                        <div class="flex items-center justify-between rounded-lg bg-emerald-50 px-4 py-3 text-sm">
+                            <span class="text-gray-700">{{ days }} {{ days === 1 ? 'nacht' : 'nachten' }}</span>
+                            <span class="font-semibold text-emerald-700">€ {{ price }}</span>
                         </div>
 
 

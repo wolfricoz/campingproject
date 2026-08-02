@@ -61,17 +61,17 @@ class BookingController extends Controller
 
             'location_id' => 'required|integer',
             'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        // TODO: Calculate price
-        $days = (new daysCalculator())
-            ->setStart($arrangementData['start_date'])
-            ->setEnd($arrangementData['end_date'])
+        $days = (new daysCalculator)
+            ->setStart(new \DateTime($arrangementData['start_date']))
+            ->setEnd(new \DateTime($arrangementData['end_date']))
             ->calculate();
 
-        $arrangementData['price_per_night'] = (new PriceCalculator())->setLocation($arrangementData['location_id'])->setDays
-        ($days)
+        $arrangementData['total_price'] = (new PriceCalculator)
+            ->setDays($days)
+            ->setLocation(Location::findOrFail($arrangementData['location_id']))
             ->calculate();
 
         // Attempt to update the data, if the id is not found create a new record
