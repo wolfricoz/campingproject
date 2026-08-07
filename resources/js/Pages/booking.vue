@@ -173,20 +173,20 @@ function submit() {
 </script>
 
 <template>
-    <Head title="Welcome"/>
+    <Head :title="__('Reservering aanvragen')"/>
     <GuestLayout :canLogin="canLogin" :canRegister="canRegister">
 
         <div class="bg-[url(/images/header.jpg)]  px-4 py-10 bg-cover bg-center">
             <div class="max-w-3xl mx-auto ">
 
                 <div class="rounded-2xl bg-white p-6 shadow-lg sm:p-8">
-                    <h2 class="text-xl font-semibold text-gray-800">Reservering aanvragen</h2>
-                    <p class="mt-1 text-sm text-gray-500">Vul je gegevens in en kies een locatie.</p>
+                    <h2 class="text-xl font-semibold text-gray-800">{{ __('Reservering aanvragen') }}</h2>
+                    <p class="mt-1 text-sm text-gray-500">{{ __('Vul je gegevens in en kies een locatie.') }}</p>
 
                     <!-- Algemene foutmelding wanneer er validatiefouten zijn -->
                     <div v-if="hasErrors"
                          class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                        <p class="font-medium">Er ging iets mis. Controleer de gemarkeerde velden:</p>
+                        <p class="font-medium">{{ __('Er ging iets mis. Controleer de gemarkeerde velden:') }}</p>
                         <ul class="mt-1 list-inside list-disc">
                             <li v-for="(message, field) in form.errors" :key="field">{{ message }}</li>
                         </ul>
@@ -196,17 +196,17 @@ function submit() {
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div class="sm:col-span-3">
-                                <label class="mb-1 block text-sm font-medium text-gray-700">Locatie <span class="text-red-600">*</span></label>
+                                <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Locatie') }} <span class="text-red-600">*</span></label>
                                 <select v-model="form.location_id"
                                         class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
-                                    <option :value="null">— Selecteer een locatie —</option>
+                                    <option :value="null">{{ __('— Selecteer een locatie —') }}</option>
                                     <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
                                 </select>
                                 <p v-if="form.errors.location_id" class="mt-1 text-xs text-red-600">{{ form.errors.location_id }}</p>
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-gray-700">Aankomst <span class="text-red-600">*</span></label>
+                                <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Aankomst') }} <span class="text-red-600">*</span></label>
                                 <div class="flex gap-2">
                                     <input type="date" v-model="startDatePart"
                                            class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
@@ -216,7 +216,7 @@ function submit() {
                                 <p v-if="form.errors.start_date" class="mt-1 text-xs text-red-600">{{ form.errors.start_date }}</p>
                             </div>
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-gray-700">Vertrek <span class="text-red-600">*</span></label>
+                                <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Vertrek') }} <span class="text-red-600">*</span></label>
                                 <div class="flex gap-2">
                                     <input type="date" v-model="endDatePart" :min="startDatePart"
                                            class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
@@ -229,28 +229,28 @@ function submit() {
 
                         <!-- Berekende nachten en prijs -->
                         <div class="flex items-center justify-between rounded-lg bg-emerald-50 px-4 py-3 text-sm">
-                            <span class="text-gray-700">{{ days }} {{ days === 1 ? 'nacht' : 'nachten' }}</span>
+                            <span class="text-gray-700">{{ __choice(':count nacht|:count nachten', days) }}</span>
                             <span class="font-semibold text-emerald-700">€ {{ price }}</span>
                         </div>
 
 
                         <div class="border-t border-gray-100 pt-6">
-                            <h3 class="mb-3 text-sm font-semibold text-gray-800">Jouw gegevens</h3>
+                            <h3 class="mb-3 text-sm font-semibold text-gray-800">{{ __('Jouw gegevens') }}</h3>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">Naam <span class="text-red-600">*</span></label>
-                                    <input type="text" v-model="form.customer.name" placeholder="Volledige naam"
+                                    <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Naam') }} <span class="text-red-600">*</span></label>
+                                    <input type="text" v-model="form.customer.name" :placeholder="__('Volledige naam')"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.name']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.name'] }}</p>
                                 </div>
                                 <div>
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">E-mail <span class="text-red-600">*</span></label>
-                                    <input type="email" v-model="form.customer.email" placeholder="naam@voorbeeld.nl"
+                                    <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('E-mail') }} <span class="text-red-600">*</span></label>
+                                    <input type="email" v-model="form.customer.email" :placeholder="__('naam@voorbeeld.nl')"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.email']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.email'] }}</p>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">Telefoonnummer</label>
+                                    <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Telefoonnummer') }}</label>
                                     <input type="tel" v-model="form.customer.phone_number" placeholder="06 12345678"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.phone_number']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.phone_number'] }}</p>
@@ -259,30 +259,30 @@ function submit() {
                         </div>
 
                         <div class="border-t border-gray-100 pt-6">
-                            <h3 class="mb-3 text-sm font-semibold text-gray-800">Adres</h3>
+                            <h3 class="mb-3 text-sm font-semibold text-gray-800">{{ __('Adres') }}</h3>
                             <div class="grid grid-cols-2 gap-3 sm:grid-cols-6">
                                 <div class="col-span-2 sm:col-span-3">
-                                    <input type="text" v-model="form.customer.street_name" placeholder="Straat"
+                                    <input type="text" v-model="form.customer.street_name" :placeholder="__('Straat')"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.street_name']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.street_name'] }}</p>
                                 </div>
                                 <div class="sm:col-span-1">
-                                    <input type="text" v-model="form.customer.street_number" placeholder="Nr."
+                                    <input type="text" v-model="form.customer.street_number" :placeholder="__('Nr.')"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.street_number']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.street_number'] }}</p>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <input type="text" v-model="form.customer.postal_code" placeholder="Postcode"
+                                    <input type="text" v-model="form.customer.postal_code" :placeholder="__('Postcode')"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.postal_code']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.postal_code'] }}</p>
                                 </div>
                                 <div class="col-span-2 sm:col-span-3">
-                                    <input type="text" v-model="form.customer.city" placeholder="Plaats"
+                                    <input type="text" v-model="form.customer.city" :placeholder="__('Plaats')"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.city']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.city'] }}</p>
                                 </div>
                                 <div class="col-span-2 sm:col-span-3">
-                                    <input type="text" v-model="form.customer.country" placeholder="Land"
+                                    <input type="text" v-model="form.customer.country" :placeholder="__('Land')"
                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
                                     <p v-if="form.errors['customer.country']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.country'] }}</p>
                                 </div>
@@ -292,16 +292,17 @@ function submit() {
                         <!-- Account Aanmaken optie -->
                         <div class="flex-col gap-2  border-t border-gray-100 pt-6">
                             <div class="flex text-xs text-gray-800 gap-2">
-                                <p>Maak een account aan en bekijk je boeking wanneer je maar wilt.</p>
+                                <p>{{ __('Maak een account aan en bekijk je boeking wanneer je maar wilt.') }}</p>
                                 <checkbox :checked="false" v-model="form.customer.create_account">
 
                                 </checkbox>
                             </div>
                             <div class="flex text-xs text-gray-800 gap-2">
 
-                                <p>Door je account aan te maken ga je akkoord met onze <Link class="href-class" href="/voorwaarden">algemene
-                                    voorwaarden</Link> en
-                                    <Link class="href-class" href="/privacy">privacyverklaring</Link>. <span class="text-red-600">*</span></p>
+                                <p>{{ __('Door je account aan te maken ga je akkoord met onze') }}
+                                    <Link class="href-class" href="/voorwaarden">{{ __('algemene voorwaarden') }}</Link>
+                                    {{ __('en') }}
+                                    <Link class="href-class" href="/privacy">{{ __('privacyverklaring') }}</Link>. <span class="text-red-600">*</span></p>
                                 <checkbox :checked="false" v-model="form.terms_accepted">
 
                                 </checkbox>
@@ -317,7 +318,7 @@ function submit() {
 
                             <button :disabled="!form.terms_accepted" type="button" @click="submit"
                                     class="w-full positive-button">
-                                Reservering aanvragen
+                                {{ __('Reservering aanvragen') }}
                             </button>
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 <script setup>
 import {ref} from "vue";
+import {usePage} from '@inertiajs/vue3';
 import arrangementModal from "@/Components/calendar/arrangementModal.vue";
 
 
@@ -45,7 +46,9 @@ function onChangeStatus(data){
 let showModal = ref(false);
 
 function formatDate(date) {
-    return new Date(date).toLocaleString('nl-NL', {
+    const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
+
+    return new Date(date).toLocaleString(locale, {
         day: 'numeric',
         month: 'numeric',
         year: 'numeric',

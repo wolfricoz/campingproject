@@ -1,5 +1,5 @@
 <script setup>
-import {Head, Link} from '@inertiajs/vue3';
+import {Head, Link, usePage} from '@inertiajs/vue3';
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 const props = defineProps({
@@ -33,7 +33,10 @@ function isPayable(reservation) {
 }
 
 function formatDate(date) {
-    return new Date(date).toLocaleString('nl-NL', {
+    // De datumnotatie volgt de gekozen taal mee.
+    const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
+
+    return new Date(date).toLocaleString(locale, {
         day: 'numeric',
         month: 'numeric',
         year: 'numeric',
@@ -44,15 +47,15 @@ function formatDate(date) {
 </script>
 
 <template>
-    <Head title="Welcome" />
+    <Head :title="__('Reserveringen')" />
     <GuestLayout :canLogin="canLogin" :canRegister="canRegister"  >
         <div class="px-4 py-10">
             <div class="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-lg sm:p-8 h-[100%]">
-                <h1 class="title-class">Reserveringen</h1>
+                <h1 class="title-class">{{ __('Reserveringen') }}</h1>
 
                 <div class="mt-6 flex flex-col divide-y divide-gray-200 border border-gray-200 rounded-lg">
 
-                    <p v-if="reservations.length < 1" class="p-4 text-sm text-gray-500 text-center">Je hebt nog geen reserveringen.</p>
+                    <p v-if="reservations.length < 1" class="p-4 text-sm text-gray-500 text-center">{{ __('Je hebt nog geen reserveringen.') }}</p>
                     <div v-else v-for="reservation in reservations" :key="reservation.id"
                          class="flex items-center justify-between gap-4 p-4">
                         <div class="min-w-0">
@@ -64,18 +67,18 @@ function formatDate(date) {
                         <div class="flex shrink-0 items-center gap-3">
                             <span class="rounded-full px-2 py-0.5 text-xs capitalize"
                                   :class="statusColors[reservation.booking_status]">
-                                {{ reservation.booking_status }}
+                                {{ __(reservation.booking_status) }}
                             </span>
                             <span class="text-sm font-semibold text-gray-800">
                                 {{ reservation.total_price ? '€ ' + reservation.total_price : '—' }}
                             </span>
                             <Link v-if="isPayable(reservation)" :href="route('payment', reservation.guid)"
                                   class="href-class text-sm">
-                                Betalen
+                                {{ __('Betalen') }}
                             </Link>
                             <span v-else-if="reservation.payment_received"
                                   class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
-                                &check; Betaald
+                                &check; {{ __('Betaald') }}
                             </span>
                         </div>
                     </div>
@@ -83,7 +86,7 @@ function formatDate(date) {
                 </div>
 
                 <Link :href="route('booking')" class="href-class mt-4 inline-block">
-                    Maak een nieuwe reservering!
+                    {{ __('Maak een nieuwe reservering!') }}
                 </Link>
             </div>
         </div>

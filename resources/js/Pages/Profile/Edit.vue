@@ -16,13 +16,13 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Profile" />
+    <Head :title="__('Profile')" />
 
     <GuestLayout>
         <div class="bg-gray-50 py-12">
             <div class="mx-auto max-w-3xl space-y-6 px-4 sm:px-6 lg:px-8">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    Profile
+                    {{ __('Profile') }}
                 </h2>
 
                 <div

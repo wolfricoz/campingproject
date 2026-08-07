@@ -31,7 +31,7 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Log in" />
+        <Head :title="__('Log in')" />
         <div class="flex justify-center items-center p-20">
             <div class="w-1/4  border border-gray-500/60 p-6 rounded-xl">
             <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
@@ -40,7 +40,7 @@ const submit = () => {
 
             <form @submit.prevent="submit">
                 <div>
-                    <InputLabel for="email" value="Email" />
+                    <InputLabel for="email" :value="__('Email')" />
 
                     <TextInput
                         id="email"
@@ -56,7 +56,7 @@ const submit = () => {
                 </div>
 
                 <div class="mt-4">
-                    <InputLabel for="password" value="Password" />
+                    <InputLabel for="password" :value="__('Password')" />
 
                     <TextInput
                         id="password"
@@ -74,21 +74,21 @@ const submit = () => {
                     <label class="flex items-center">
                         <Checkbox name="remember" v-model:checked="form.remember" />
                         <span class="ms-2 text-sm text-gray-600"
-                        >Remember me</span
+                        >{{ __('Remember me') }}</span
                         >
                     </label>
                 </div>
 
                 <div class="mt-4 gap-2 flex items-center justify-end">
                     <Link :href="route('register')" class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Registeer
+                        {{ __('Registreren') }}
                     </Link>
                     <Link
                         v-if="canResetPassword"
                         :href="route('password.request')"
                         class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        Wachtwoord Vergeten?
+                        {{ __('Wachtwoord vergeten?') }}
                     </Link>
 
                     <PrimaryButton
@@ -96,7 +96,7 @@ const submit = () => {
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
                     >
-                        Log in
+                        {{ __('Log in') }}
                     </PrimaryButton>
                 </div>
             </form>

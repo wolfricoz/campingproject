@@ -4,10 +4,12 @@ import Dropdown from "@/Components/Dropdown.vue";
 import {usePage} from '@inertiajs/vue3';
 import {computed} from "vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
+import LocaleToggle from "@/Components/LocaleToggle.vue";
 
 defineProps({
     canLogin: {
         type: Boolean,
+        default: true
     },
     canRegister: {
         type: Boolean,
@@ -37,25 +39,25 @@ function handleImageError() {
                     </Link>
                     <div class="flex flex-row gap-6 ml-auto">
                         <Link href="https://google.com/" class="nav-button">
-                            Home
+                            {{ __('Home') }}
                         </Link>
                         <Link href="#" class="nav-button">
-                            Locaties
+                            {{ __('Locaties') }}
                         </Link>
                         <Link href="#" class="nav-button">
-                            Over Ons
+                            {{ __('Over Ons') }}
                         </Link>
                         <Link v-if="canLogin" :href="route('login')" class="nav-button">
-                            Login
+                            {{ __('Login') }}
                         </Link>
-                        <Dropdown align="middle" width="48">
+                        <Dropdown v-else align="middle" width="48">
                             <template #trigger>
                                         <span class="inline-flex rounded-md">
                                             <button
                                                 type="button"
                                                 class="nav-button"
                                             >
-                                                {{ $page.props.auth.user.name }}
+                                                {{ user?.name }}
 
 
                                             </button>
@@ -64,22 +66,24 @@ function handleImageError() {
 
                             <template #content>
                                 <dropdownLink :href="route('dashboard')">
-                                    Dashboard
+                                    {{ __('Dashboard') }}
                                 </dropdownLink>
                                 <DropdownLink
                                     :href="route('profile.edit')"
                                 >
-                                    Profile
+                                    {{ __('Profiel') }}
                                 </DropdownLink>
                                 <DropdownLink
                                     :href="route('logout')"
                                     method="post"
                                     as="button"
                                 >
-                                    Log Out
+                                    {{ __('Uitloggen') }}
                                 </DropdownLink>
                             </template>
                         </Dropdown>
+
+                        <LocaleToggle class="text-gray-200"/>
                     </div>
                 </div>
             </div>
@@ -100,9 +104,9 @@ function handleImageError() {
                 <span class="text-gray-600">•</span>
                 <span>VAT: 1234567</span>
                 <span class="text-gray-600">•</span>
-                <span>Locatie: Florijnstraat 20 4879 AH, Etten-Leur</span>
+                <span>{{ __('Locatie') }}: Florijnstraat 20 4879 AH, Etten-Leur</span>
                 <span class="text-gray-600">•</span>
-                <span>Email: Ricardo.sas@syntec-it.nl</span>
+                <span>{{ __('E-mail') }}: Ricardo.sas@syntec-it.nl</span>
             </div>
         </footer>
     </div>

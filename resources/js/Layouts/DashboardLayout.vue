@@ -6,6 +6,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
+import LocaleToggle from '@/Components/LocaleToggle.vue';
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -13,14 +14,14 @@ const showingNavigationDropdown = ref(false);
 <template>
     <div>
         <div class="h-screen overflow-hidden bg-gray-100">
-            <div class="flex ">
+            <div class="flex justi">
 
             <nav
                 class="border-b border-gray-100 bg-white rounded-r-xl"
             >
                 <!-- Primary Navigation Menu -->
                 <div class="h-screen overflow-hidden w-64">
-                    <div class="flex-col h-16 justify-between">
+                    <div class="flex flex-col h-full justify-between">
 
                         <div class="flex-col">
                             <!-- Logo -->
@@ -41,25 +42,26 @@ const showingNavigationDropdown = ref(false);
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
-                                    Dashboard
+                                    {{ __('Dashboard') }}
                                 </NavLink>
-                                <NavLink
-                                    :href="route('home')"
-                                    :active="route().current('home')"
-                                >
-                                    Homepage
-                                </NavLink>
+
                                 <NavLink
                                     :href="route('arrangement.index')"
                                     :active="route().current('arrangement.index') && !route().params.status"
                                 >
-                                    Alle reserveringen
+                                    {{ __('Alle reserveringen') }}
                                 </NavLink>
                                 <NavLink
                                     :href="route('arrangement.index', 'pending')"
                                     :active="route().current('arrangement.index') && route().params.status === 'pending'"
                                 >
-                                    in behandeling reserveringen
+                                    {{ __('Reserveringen in behandeling') }}
+                                </NavLink>
+                                <NavLink
+                                    :href="route('locations.index')"
+                                    :active="route().current('locations.index') && !route().params.status"
+                                >
+                                    {{ __('Locaties') }}
                                 </NavLink>
 
                             </div>
@@ -68,7 +70,7 @@ const showingNavigationDropdown = ref(false);
                         <div class="hidden  sm:flex sm:items-center">
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
-                                <Dropdown align="right" width="48">
+                                <Dropdown align="left" width="48" drop-up>
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
                                             <button
@@ -94,21 +96,26 @@ const showingNavigationDropdown = ref(false);
                                     </template>
 
                                     <template #content>
+                                        <DropdownLink :href="route('home')">
+                                            {{ __('Naar de website') }}
+                                        </DropdownLink>
                                         <DropdownLink
                                             :href="route('profile.edit')"
                                         >
-                                            Profile
+                                            {{ __('Profiel') }}
                                         </DropdownLink>
                                         <DropdownLink
                                             :href="route('logout')"
                                             method="post"
                                             as="button"
                                         >
-                                            Log Out
+                                            {{ __('Uitloggen') }}
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
                             </div>
+
+                            <LocaleToggle class="ms-3 text-gray-500"/>
                         </div>
 
                         <!-- Hamburger -->
@@ -167,7 +174,7 @@ const showingNavigationDropdown = ref(false);
                             :href="route('dashboard')"
                             :active="route().current('dashboard')"
                         >
-                            Dashboard
+                            {{ __('Dashboard') }}
                         </ResponsiveNavLink>
                     </div>
 
@@ -188,14 +195,14 @@ const showingNavigationDropdown = ref(false);
 
                         <div class="mt-3 space-y-1">
                             <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
+                                {{ __('Profiel') }}
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 :href="route('logout')"
                                 method="post"
                                 as="button"
                             >
-                                Log Out
+                                {{ __('Uitloggen') }}
                             </ResponsiveNavLink>
                         </div>
                     </div>

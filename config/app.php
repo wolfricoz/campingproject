@@ -78,11 +78,17 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'nl'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'nl'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+
+    /*
+     * De talen waar de bezoeker uit kan kiezen. De eerste is de brontaal:
+     * daarvoor bestaat geen vertaalbestand, de teksten in de code zijn al Nederlands.
+     */
+    'available_locales' => ['nl', 'en'],
 
     /*
     |--------------------------------------------------------------------------

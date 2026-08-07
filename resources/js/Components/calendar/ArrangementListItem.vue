@@ -1,5 +1,6 @@
 <script setup>
 import {ref} from "vue";
+import {usePage} from '@inertiajs/vue3';
 import arrangementModal from "@/Components/calendar/arrangementModal.vue";
 
 
@@ -45,7 +46,9 @@ function onChangeStatus(data){
 let showModal = ref(false);
 
 function formatDate(date) {
-    return new Date(date).toLocaleString('nl-NL', {
+    const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
+
+    return new Date(date).toLocaleString(locale, {
         day: 'numeric',
         month: 'numeric',
         year: 'numeric',
@@ -73,16 +76,16 @@ function formatDate(date) {
         <div class="flex items-stretch gap-4 divide-x divide-black/10">
             <!-- Location -->
             <div class="min-w-0 flex-1">
-                <p class="text-[10px] uppercase tracking-wide text-gray-400">Locatie</p>
+                <p class="text-[10px] uppercase tracking-wide text-gray-400">{{ __('Locatie') }}</p>
                 <h3 class="truncate text-sm font-semibold text-gray-800">{{ arrangement.location?.name }}</h3>
                 <p class="truncate text-[11px] text-gray-500">
-                    {{ arrangement.location?.type }} · {{ arrangement.location?.capacity }} pers · {{ arrangement.location?.bedrooms }} slk
+                    {{ arrangement.location?.type }} · {{ arrangement.location?.capacity }} {{ __('pers') }} · {{ arrangement.location?.bedrooms }} {{ __('slk') }}
                 </p>
             </div>
 
             <!-- Customer -->
             <div class="min-w-0 flex-1 pl-4">
-                <p class="text-[10px] uppercase tracking-wide text-gray-400">Klant</p>
+                <p class="text-[10px] uppercase tracking-wide text-gray-400">{{ __('Klant') }}</p>
                 <p class="truncate text-sm font-medium text-gray-700">{{ arrangement.customer?.name }}</p>
                 <p class="truncate text-[11px] text-gray-500">{{ arrangement.customer?.email }}</p>
                 <p class="truncate text-[11px] text-gray-500">
@@ -92,7 +95,7 @@ function formatDate(date) {
 
             <!-- Dates -->
             <div class="min-w-0 flex-1 pl-4">
-                <p class="text-[10px] uppercase tracking-wide text-gray-400">Periode</p>
+                <p class="text-[10px] uppercase tracking-wide text-gray-400">{{ __('Periode') }}</p>
                 <p class="truncate text-[11px] text-gray-600">{{ formatDate(arrangement.start_date) }}</p>
                 <p class="truncate text-[11px] text-gray-600">{{ formatDate(arrangement.end_date) }}</p>
             </div>
@@ -100,12 +103,12 @@ function formatDate(date) {
             <!-- Status / price / payment -->
             <div class="min-w-0 flex-1 pl-4 flex flex-col items-start gap-1">
                 <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/60 text-gray-700 capitalize">
-                    {{ arrangement.booking_status }}
+                    {{ __(arrangement.booking_status) }}
                 </span>
                 <span class="text-sm font-semibold text-gray-800">€ {{ arrangement.total_price }}</span>
                 <span class="text-[10px] px-1.5 py-0.5 rounded-full"
                       :class="arrangement.payment_received ? 'bg-emerald-200 text-emerald-800' : 'bg-red-200 text-red-800'">
-                    {{ arrangement.payment_received ? 'Betaald' : 'Niet betaald' }}
+                    {{ arrangement.payment_received ? __('Betaald') : __('Niet betaald') }}
                 </span>
             </div>
         </div>

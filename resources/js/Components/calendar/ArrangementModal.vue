@@ -1,5 +1,6 @@
 <script setup>
 import {ref, computed, watch} from 'vue';
+import {__} from '@/translate';
 
 const props = defineProps({
     showModal: {type: Boolean, default: false},
@@ -151,7 +152,7 @@ async function save() {
 function changeStatus(status){
     // As a safety, we will prompt a confirm for certain statusses (eg. cancel)
     if (status === 'cancelled' || status === 'rejected') {
-        let result = confirm(`Are you sure you want to ${status} this reservation?`)
+        let result = confirm(__('Weet je zeker dat je deze reservering wilt :status?', {status: __(status)}))
         if (!result) {
             return
         }
@@ -270,7 +271,7 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                 <h2 class="text-lg font-semibold text-gray-800">
-                    {{ arrangement ? 'Reservering bewerken' : 'Nieuwe reservering' }}
+                    {{ arrangement ? __('Reservering bewerken') : __('Nieuwe reservering') }}
                 </h2>
                 <button class="text-gray-400 hover:text-gray-600 text-xl leading-none" @click="close">&times;</button>
             </div>
@@ -279,30 +280,30 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                 <!-- === Booking fields === -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* Klant</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Klant') }}</label>
                         <select v-model="form.customer_id"
                                 class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                 required
                         >
-                            <option :value="null">— Selecteer klant —</option>
-                            <option :value="0">Nieuwe Klant</option>
+                            <option :value="null">{{ __('— Selecteer klant —') }}</option>
+                            <option :value="0">{{ __('Nieuwe klant') }}</option>
                             <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* Locatie</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Locatie') }}</label>
                         <select v-model="form.location_id"
                                 class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                 required
                         >
-                            <option :value="null">— Selecteer locatie —</option>
+                            <option :value="null">{{ __('— Selecteer locatie —') }}</option>
                             <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* Startdatum</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Startdatum') }}</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="startDatePart"
                                    class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
@@ -316,7 +317,7 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* Einddatum</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Einddatum') }}</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="endDatePart" :min="startDatePart"
                                    class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
@@ -332,18 +333,18 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
 
                 <!-- Berekende nachten en prijs -->
                 <div class="flex items-center justify-between rounded-lg bg-emerald-50 px-4 py-3 text-sm">
-                    <span class="text-gray-700">{{ days }} {{ days === 1 ? 'nacht' : 'nachten' }}</span>
+                    <span class="text-gray-700">{{ __choice(':count nacht|:count nachten', days) }}</span>
                     <span class="font-semibold text-emerald-700">€ {{ price }}</span>
                 </div>
 
                 <!-- Payment received (read-only) -->
                 <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-gray-700">Betaling ontvangen:</span>
+                    <span class="text-sm font-medium text-gray-700">{{ __('Betaling ontvangen') }}:</span>
                     <span class="text-sm px-2 py-0.5 rounded-full"
                           :class="form.payment_received ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
-                        {{ form.payment_received ? 'Ja' : 'Nee' }}
+                        {{ form.payment_received ? __('Ja') : __('Nee') }}
                     </span>
-                    <span class="text-sm font-medium text-gray-700">Reservering Status:</span>
+                    <span class="text-sm font-medium text-gray-700">{{ __('Reservering status') }}:</span>
                     <span class="text-sm px-2 py-0.5 rounded-full"
                           :class="{
         'bg-gray-100 border-gray-400':      arrangement.booking_status === 'pending',
@@ -353,38 +354,38 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
         'bg-red-100 border-red-500':        arrangement.booking_status === 'cancelled',
         'bg-rose-100 border-rose-500':      arrangement.booking_status === 'rejected',
     }">
-                        {{ arrangement.booking_status }}
+                        {{ __(arrangement.booking_status) }}
                     </span>
                 </div>
 <!--            === Locatie gegevens ===    -->
                 <div class="border border-gray-200 rounded-xl p-4 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-800 mb-3">* Locatiegegevens</h3>
+                    <h3 class="text-sm font-semibold text-gray-800 mb-3">* {{ __('Locatiegegevens') }}</h3>
                     <div v-if="selectedLocation" class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm">
-                        <div><span class="text-gray-500">Naam:</span> {{ selectedLocation.name }}</div>
-                        <div><span class="text-gray-500">Type:</span> {{ selectedLocation.type ?? '—' }}</div>
-                        <div><span class="text-gray-500">Capaciteit:</span> {{ selectedLocation.capacity ?? '—' }}</div>
-                        <div><span class="text-gray-500">Slaapkamers:</span> {{ selectedLocation.bedrooms }}</div>
-                        <div><span class="text-gray-500">Grootte:</span> {{ selectedLocation.size ? selectedLocation.size + ' m²' : '—' }}
+                        <div><span class="text-gray-500">{{ __('Naam') }}:</span> {{ selectedLocation.name }}</div>
+                        <div><span class="text-gray-500">{{ __('Type') }}:</span> {{ selectedLocation.type ?? '—' }}</div>
+                        <div><span class="text-gray-500">{{ __('Capaciteit') }}:</span> {{ selectedLocation.capacity ?? '—' }}</div>
+                        <div><span class="text-gray-500">{{ __('Slaapkamers') }}:</span> {{ selectedLocation.bedrooms }}</div>
+                        <div><span class="text-gray-500">{{ __('Grootte') }}:</span> {{ selectedLocation.size ? selectedLocation.size + ' m²' : '—' }}
                         </div>
-                        <div><span class="text-gray-500">Prijs/nacht:</span>
+                        <div><span class="text-gray-500">{{ __('Prijs/nacht') }}:</span>
                             {{ selectedLocation.price_per_night ? '€ ' + selectedLocation.price_per_night : '—' }}
                         </div>
-                        <div><span class="text-gray-500">Stroom:</span> {{ selectedLocation.has_electricity ? 'Ja' : 'Nee' }}</div>
-                        <div><span class="text-gray-500">Water:</span> {{ selectedLocation.has_water ? 'Ja' : 'Nee' }}</div>
-                        <div><span class="text-gray-500">Schaduw:</span> {{ selectedLocation.has_shade ? 'Ja' : 'Nee' }}</div>
+                        <div><span class="text-gray-500">{{ __('Stroom') }}:</span> {{ selectedLocation.has_electricity ? __('Ja') : __('Nee') }}</div>
+                        <div><span class="text-gray-500">{{ __('Water') }}:</span> {{ selectedLocation.has_water ? __('Ja') : __('Nee') }}</div>
+                        <div><span class="text-gray-500">{{ __('Schaduw') }}:</span> {{ selectedLocation.has_shade ? __('Ja') : __('Nee') }}</div>
                         <div class="col-span-full">
-                            <span class="text-gray-500">Beschrijving:</span> {{ selectedLocation.description ?? '—' }}
+                            <span class="text-gray-500">{{ __('Beschrijving') }}:</span> {{ selectedLocation.description ?? '—' }}
                         </div>
                     </div>
-                    <p v-else class="text-sm text-gray-400">Selecteer een locatie om de gegevens te zien.</p>
+                    <p v-else class="text-sm text-gray-400">{{ __('Selecteer een locatie om de gegevens te zien.') }}</p>
                 </div>
 
                 <!--            === Klant gegevens ===    -->
                 <div class="border border-gray-200 rounded-xl p-4">
-                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Klantgegevens</h3>
+                    <h3 class="text-sm font-semibold text-gray-800 mb-3">{{ __('Klantgegevens') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">* Naam</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Naam') }}</label>
                             <input type="text" v-model="form.customer.name"
                                    class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
@@ -392,7 +393,7 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                             />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">* E-mail</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('E-mail') }}</label>
                             <input type="email" v-model="form.customer.email"
                                    class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
@@ -400,7 +401,7 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                             />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">* Telefoonnummer</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Telefoonnummer') }}</label>
                             <input type="tel" v-model="form.customer.phone_number"
                                    class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
@@ -410,25 +411,25 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     </div>
 
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* Adres</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Adres') }}</label>
                         <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
-                            <input type="text" v-model="form.customer.street_name" placeholder="Straat"
+                            <input type="text" v-model="form.customer.street_name" :placeholder="__('Straat')"
                                    class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
                             />
-                            <input type="text" v-model="form.customer.street_number" placeholder="Nr."
+                            <input type="text" v-model="form.customer.street_number" :placeholder="__('Nr.')"
                                    class="sm:col-span-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
                             />
-                            <input type="text" v-model="form.customer.postal_code" placeholder="Postcode"
+                            <input type="text" v-model="form.customer.postal_code" :placeholder="__('Postcode')"
                                    class="sm:col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
                             />
-                            <input type="text" v-model="form.customer.city" placeholder="Plaats"
+                            <input type="text" v-model="form.customer.city" :placeholder="__('Plaats')"
                                    class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
                             />
-                            <input type="text" v-model="form.customer.country" placeholder="Land"
+                            <input type="text" v-model="form.customer.country" :placeholder="__('Land')"
                                    class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
                                    required
                             />
@@ -439,10 +440,10 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                         <input type="checkbox" v-model="form.customer.create_account"
                                class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                         />
-                        Account aanmaken voor deze klant
+                        {{ __('Account aanmaken voor deze klant') }}
                     </label>
                     <span v-else class="flex items-center gap-2 mt-4 text-sm text-gray-700">
-                        Klant heeft al een account
+                        {{ __('Klant heeft al een account') }}
                     </span>
                 </div>
             </div>
@@ -454,14 +455,14 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                             @click="changeStatus('finished')"
                             v-show="props.arrangement"
                     >
-                        Check-out
+                        {{ __('Check-out') }}
                     </button>
                     <button v-if="arrangement?.booking_status === 'confirmed' "
                             class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
                             @click="changeStatus('checked-in')"
                             v-show="props.arrangement"
                     >
-                        Check-in
+                        {{ __('Check-in') }}
                     </button>
 
                     <button v-if="arrangement?.booking_status === 'pending' "
@@ -469,30 +470,30 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                             @click="changeStatus('confirmed')"
                             v-show="props.arrangement"
                     >
-                        Bevestig
+                        {{ __('Bevestig') }}
                     </button>
                     <button v-if="arrangement?.booking_status === 'pending' "
                             class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700"
                             @click="changeStatus('rejected')"
                             v-show="props.arrangement"
                     >
-                        Afwijzen
+                        {{ __('Afwijzen') }}
                     </button>
                     <button class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700" @click="save">
-                        {{ props.arrangement ? 'Bijwerken' : 'Opslaan' }}
+                        {{ props.arrangement ? __('Bijwerken') : __('Opslaan') }}
                     </button>
                     <button class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700" @click="changeStatus('cancelled')"
                             v-show="props.arrangement"
                             v-if="arrangement?.booking_status !== 'checked-in' && arrangement?.booking_status !== 'finished' &&
                             arrangement?.booking_status !== 'pending' "
                     >
-                        Reservatie Annuleren
+                        {{ __('Reservering annuleren') }}
                     </button>
                 </div>
                 <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
                     <button
                         class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50" @click="close">
-                        Annuleren
+                        {{ __('Annuleren') }}
                     </button>
 
                 </div>

@@ -20,6 +20,10 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
         Route::post('/update/status/', [ArrangementController::class, 'update'])->name('status');
 
     });
+    Route::name('locations.')->prefix('locations')->group(function () {
+
+        Route::post('/store', [LocationController::class, 'store'])->name('store');
+    });
 });
 
 // The public booking page needs these to show the amount of nights and the price, so they run without auth.

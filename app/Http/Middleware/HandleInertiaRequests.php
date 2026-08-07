@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -34,6 +35,25 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'locale' => app()->getLocale(),
+            'translations' => $this->translations(),
         ];
+    }
+
+    /**
+     * De vertalingen van de actieve taal. Voor de brontaal bestaat geen bestand;
+     * de front-end valt dan terug op de sleutel, en dat is de Nederlandse tekst.
+     *
+     * @return array<string, string>
+     */
+    protected function translations(): array
+    {
+        $path = lang_path(app()->getLocale().'.json');
+
+        if (! File::exists($path)) {
+            return [];
+        }
+
+        return File::json($path, JSON_THROW_ON_ERROR);
     }
 }

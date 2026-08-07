@@ -126,7 +126,7 @@ const showCreateModal = ref(false);
 </script>
 
 <template>
-    <Head title="Alle Reserveringen"/>
+    <Head :title="__('Alle reserveringen')"/>
     <div v-if="showCreateModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20" >
         <arrangement-modal :show-modal="showCreateModal" @close="showCreateModal = false" @save="onSave">
 
@@ -136,7 +136,7 @@ const showCreateModal = ref(false);
         <div class="h-full w-full p-2 ">
             <section class="border-gray-50 border rounded-lg bg-gray-50">
                 <div class="w-full">
-                    <h1 class="text-2xl font-bold text-center">Alle Reserveringen</h1>
+                    <h1 class="text-2xl font-bold text-center">{{ __('Alle reserveringen') }}</h1>
                 </div>
                 <div class="gap-2 flex flex-col p-6">
                     <ArrangementListItem v-for="arrangement in arrangements" :key="arrangement.id"  :arrangement="arrangement">

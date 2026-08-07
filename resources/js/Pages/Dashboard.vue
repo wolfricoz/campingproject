@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/DashboardLayout.vue';
-import {Head} from '@inertiajs/vue3';
+import {Head, usePage} from '@inertiajs/vue3';
 import ArrangementCard from "@/Components/calendar/ArrangementCard.vue";
 import {computed, ref} from "vue";
 import ArrangementModal from "@/Components/calendar/ArrangementModal.vue";
@@ -117,7 +117,10 @@ function onChangeStatus(data){
 // === Data ===
 const now = new Date();
 const weekNumber = getWeek(now);
-const monthName = new Date().toLocaleDateString('nl-NL', {month: 'long', year: 'numeric'});
+const monthName = computed(() => new Date().toLocaleDateString(
+    usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL',
+    {month: 'long', year: 'numeric'}
+));
 const days = computed(() => populateArrangements());
 const showCreateModal = ref(false);
 
@@ -125,7 +128,7 @@ const showCreateModal = ref(false);
 </script>
 
 <template>
-    <Head title="Dashboard"/>
+    <Head :title="__('Dashboard')"/>
     <div v-if="showCreateModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20" >
         <arrangement-modal :show-modal="showCreateModal" @close="showCreateModal = false" @save="onSave">
 
@@ -135,11 +138,11 @@ const showCreateModal = ref(false);
         <div class="h-full w-full p-2">
             <section class="border-gray-50 border rounded-lg bg-gray-50">
                 <div class="title-class">
-                    Planning Dashboard<br>
+                    {{ __('Planning Dashboard') }}<br>
                     <span class="text-lg underline">{{ monthName }}</span>
                     <div id="actions" class="flex justify-end px-4 py-2 text-sm text-gray-700">
                         <button class="positive-button" @click="showCreateModal = true" @change-status="onChangeStatus">
-                            Maak nieuwe reservering
+                            {{ __('Maak nieuwe reservering') }}
                         </button>
                     </div>
 
@@ -149,25 +152,25 @@ const showCreateModal = ref(false);
                         <thead>
                         <tr>
                             <th class="table-base">
-                                Maandag
+                                {{ __('Maandag') }}
                             </th>
                             <th class="table-base">
-                                Dinsdag
+                                {{ __('Dinsdag') }}
                             </th>
                             <th class="table-base">
-                                Woensdag
+                                {{ __('Woensdag') }}
                             </th>
                             <th class="table-base">
-                                Donderdag
+                                {{ __('Donderdag') }}
                             </th>
                             <th class="table-base">
-                                Vrijdag
+                                {{ __('Vrijdag') }}
                             </th>
                             <th class="table-base">
-                                Zaterdag
+                                {{ __('Zaterdag') }}
                             </th>
                             <th class="table-base">
-                                Zondag
+                                {{ __('Zondag') }}
                             </th>
                         </tr>
                         </thead>
