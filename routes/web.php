@@ -3,19 +3,28 @@
 use App\Http\Controllers\ArrangementController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FrontEndController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Location;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
+# === Customer Facing Routes
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => (Route::has('login') && ! auth()->check()),
         'canRegister' => Route::has('register'),
+        'locations' => Location::where('status', 1)->limit(4)->get(),
     ]);
 })->name('home');
+Route::get('/about', [FrontEndController::class, 'about'])->name('about');
+Route::get('/contact', [FrontEndController::class, 'contact'])->name('contact');
+Route::get('/locations', [FrontEndController::class, 'locations'])->name('locations');
+
+
+
 Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 Route::get('/booking', [BookingController::class, 'index'])->name('booking');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');

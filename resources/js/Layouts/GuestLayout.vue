@@ -38,14 +38,17 @@ function handleImageError() {
                         Syntec Camping
                     </Link>
                     <div class="flex flex-row gap-6 ml-auto">
-                        <Link href="https://google.com/" class="nav-button">
+                        <Link :href="route('home')" class="nav-button">
                             {{ __('Home') }}
                         </Link>
-                        <Link href="#" class="nav-button">
+                        <Link :href="route('locations')" class="nav-button">
                             {{ __('Locaties') }}
                         </Link>
-                        <Link href="#" class="nav-button">
+                        <Link :href="route('about')" class="nav-button">
                             {{ __('Over Ons') }}
+                        </Link>
+                        <Link :href="route('contact')" class="nav-button">
+                            {{ __('Contact') }}
                         </Link>
                         <Link v-if="canLogin" :href="route('login')" class="nav-button">
                             {{ __('Login') }}
