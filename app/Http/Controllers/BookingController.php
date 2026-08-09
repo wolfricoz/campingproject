@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingConfirmMail;
+use App\Mail\BookingNotificationMail;
 use App\Models\Arrangement;
 use App\Models\Customer;
 use App\Models\Location;
@@ -9,6 +11,7 @@ use App\Services\daysCalculator;
 use App\Services\PriceCalculator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -90,7 +93,24 @@ class BookingController extends Controller
 
         $arrangementResult = Arrangement::find($arrangementData['id']);
 
+        $this->sendBookingMails($arrangementResult);
+
         return redirect()->route('payment', ['guid' => $arrangementResult['guid']]);
 
+    }
+
+
+    private function sendBookingMails(Arrangement $arrangement): void
+    {
+        $arrangement->loadMissing(['customer', 'location']);
+
+        try {
+            Mail::to($arrangement->customer->email)->send(new BookingConfirmMail($arrangement));
+            Mail::to(config('mail.contact_email'))->send(new BookingNotificationMail($arrangement));
+
+            $arrangement->update(['confirmation_email_sent' => true]);
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
     }
 }
