@@ -18,7 +18,7 @@ class LocationController extends Controller
     {
         $locations = Location::where('status', 1)->get();
 
-        return Inertia::render('locations/index', ['locations' => $locations]);
+        return Inertia::render('Admin/Locations/Index', ['locations' => $locations]);
     }
 
     public function store()

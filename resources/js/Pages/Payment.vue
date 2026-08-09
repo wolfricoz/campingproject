@@ -41,7 +41,7 @@ function submit() {
         <div class="bg-[url(/images/header.jpg)]  px-4 py-10 bg-cover bg-center h-full">
             <div class="max-w-3xl mx-auto ">
 
-                <div class="rounded-2xl bg-white p-6 shadow-lg sm:p-8">
+                <div class="card-base">
                     <h1 class="text-2xl font-semibold text-gray-800">
                         {{ __('Payment Placeholder') }}
                     </h1>

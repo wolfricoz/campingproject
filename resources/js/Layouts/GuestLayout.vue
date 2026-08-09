@@ -44,6 +44,9 @@ function handleImageError() {
                         <Link :href="route('locations')" class="nav-button">
                             {{ __('Locaties') }}
                         </Link>
+                        <Link :href="route('news')" class="nav-button">
+                            {{ __('Nieuws') }}
+                        </Link>
                         <Link :href="route('about')" class="nav-button">
                             {{ __('Over Ons') }}
                         </Link>

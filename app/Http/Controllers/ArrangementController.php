@@ -42,7 +42,7 @@ class ArrangementController extends Controller
             ->get();
 
         // dd($arrangements);
-        return Inertia::render('Arrangements/index', [
+        return Inertia::render('Admin/Arrangements/Index', [
             'arrangements' => $arrangements,
         ]);
 

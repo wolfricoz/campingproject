@@ -23,9 +23,10 @@ class ArrangementFactory extends Factory
         $startDate = $this->faker->dateTimeBetween(now()->startOfMonth(), now()->endOfMonth());
 
         // Stay length is 1 to 10 days, end_date can spill into next month
-        $endDate = (clone $startDate)->modify('+' . $this->faker->numberBetween(1, 10) . ' days');
+        $endDate = (clone $startDate)->modify('+'.$this->faker->numberBetween(1, 10).' days');
 
         return [
+            'guid' => $this->faker->uuid(),
             'customer_id' => Customer::factory(),
             'location_id' => Location::factory(),
             'start_date' => $startDate,

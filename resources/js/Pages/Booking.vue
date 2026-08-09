@@ -179,7 +179,7 @@ function submit() {
         <div class="bg-[url(/images/header.jpg)]  px-4 py-10 bg-cover bg-center">
             <div class="max-w-3xl mx-auto ">
 
-                <div class="rounded-2xl bg-white p-6 shadow-lg sm:p-8">
+                <div class="card-base">
                     <h2 class="text-xl font-semibold text-gray-800">{{ __('Reservering aanvragen') }}</h2>
                     <p class="mt-1 text-sm text-gray-500">{{ __('Vul je gegevens in en kies een locatie.') }}</p>
 
@@ -196,34 +196,34 @@ function submit() {
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div class="sm:col-span-3">
-                                <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Locatie') }} <span class="text-red-600">*</span></label>
+                                <label class="label-base">{{ __('Locatie') }} <span class="text-red-600">*</span></label>
                                 <select v-model="form.location_id"
-                                        class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                                        class="w-full input-base">
                                     <option :value="null">{{ __('— Selecteer een locatie —') }}</option>
                                     <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
                                 </select>
-                                <p v-if="form.errors.location_id" class="mt-1 text-xs text-red-600">{{ form.errors.location_id }}</p>
+                                <p v-if="form.errors.location_id" class="error-base">{{ form.errors.location_id }}</p>
                             </div>
 
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Aankomst') }} <span class="text-red-600">*</span></label>
+                                <label class="label-base">{{ __('Aankomst') }} <span class="text-red-600">*</span></label>
                                 <div class="flex gap-2">
                                     <input type="date" v-model="startDatePart"
-                                           class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                           class="flex-1 input-base"/>
                                     <input type="time" v-model="startTimePart" step="60"
-                                           class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                           class="input-base"/>
                                 </div>
-                                <p v-if="form.errors.start_date" class="mt-1 text-xs text-red-600">{{ form.errors.start_date }}</p>
+                                <p v-if="form.errors.start_date" class="error-base">{{ form.errors.start_date }}</p>
                             </div>
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Vertrek') }} <span class="text-red-600">*</span></label>
+                                <label class="label-base">{{ __('Vertrek') }} <span class="text-red-600">*</span></label>
                                 <div class="flex gap-2">
                                     <input type="date" v-model="endDatePart" :min="startDatePart"
-                                           class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                           class="flex-1 input-base"/>
                                     <input type="time" v-model="endTimePart" step="60"
-                                           class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
+                                           class="input-base"/>
                                 </div>
-                                <p v-if="form.errors.end_date" class="mt-1 text-xs text-red-600">{{ form.errors.end_date }}</p>
+                                <p v-if="form.errors.end_date" class="error-base">{{ form.errors.end_date }}</p>
                             </div>
                         </div>
 
@@ -238,22 +238,22 @@ function submit() {
                             <h3 class="mb-3 text-sm font-semibold text-gray-800">{{ __('Jouw gegevens') }}</h3>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Naam') }} <span class="text-red-600">*</span></label>
+                                    <label class="label-base">{{ __('Naam') }} <span class="text-red-600">*</span></label>
                                     <input type="text" v-model="form.customer.name" :placeholder="__('Volledige naam')"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.name']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.name'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.name']" class="error-base">{{ form.errors['customer.name'] }}</p>
                                 </div>
                                 <div>
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('E-mail') }} <span class="text-red-600">*</span></label>
+                                    <label class="label-base">{{ __('E-mail') }} <span class="text-red-600">*</span></label>
                                     <input type="email" v-model="form.customer.email" :placeholder="__('naam@voorbeeld.nl')"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.email']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.email'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.email']" class="error-base">{{ form.errors['customer.email'] }}</p>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="mb-1 block text-sm font-medium text-gray-700">{{ __('Telefoonnummer') }}</label>
+                                    <label class="label-base">{{ __('Telefoonnummer') }}</label>
                                     <input type="tel" v-model="form.customer.phone_number" placeholder="06 12345678"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.phone_number']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.phone_number'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.phone_number']" class="error-base">{{ form.errors['customer.phone_number'] }}</p>
                                 </div>
                             </div>
                         </div>
@@ -263,28 +263,28 @@ function submit() {
                             <div class="grid grid-cols-2 gap-3 sm:grid-cols-6">
                                 <div class="col-span-2 sm:col-span-3">
                                     <input type="text" v-model="form.customer.street_name" :placeholder="__('Straat')"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.street_name']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.street_name'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.street_name']" class="error-base">{{ form.errors['customer.street_name'] }}</p>
                                 </div>
                                 <div class="sm:col-span-1">
                                     <input type="text" v-model="form.customer.street_number" :placeholder="__('Nr.')"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.street_number']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.street_number'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.street_number']" class="error-base">{{ form.errors['customer.street_number'] }}</p>
                                 </div>
                                 <div class="sm:col-span-2">
                                     <input type="text" v-model="form.customer.postal_code" :placeholder="__('Postcode')"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.postal_code']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.postal_code'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.postal_code']" class="error-base">{{ form.errors['customer.postal_code'] }}</p>
                                 </div>
                                 <div class="col-span-2 sm:col-span-3">
                                     <input type="text" v-model="form.customer.city" :placeholder="__('Plaats')"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.city']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.city'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.city']" class="error-base">{{ form.errors['customer.city'] }}</p>
                                 </div>
                                 <div class="col-span-2 sm:col-span-3">
                                     <input type="text" v-model="form.customer.country" :placeholder="__('Land')"
-                                           class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"/>
-                                    <p v-if="form.errors['customer.country']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.country'] }}</p>
+                                           class="w-full input-base"/>
+                                    <p v-if="form.errors['customer.country']" class="error-base">{{ form.errors['customer.country'] }}</p>
                                 </div>
                             </div>
                         </div>
@@ -307,9 +307,9 @@ function submit() {
 
                                 </checkbox>
                             </div>
-                            <p v-if="form.errors.terms_accepted" class="mt-1 text-xs text-red-600">{{ form.errors.terms_accepted }}</p>
-                            <p v-if="form.errors['customer.create_account']" class="mt-1 text-xs text-red-600">{{ form.errors['customer.create_account'] }}</p>
-                            <p v-if="form.errors.customer_id" class="mt-1 text-xs text-red-600">{{ form.errors.customer_id }}</p>
+                            <p v-if="form.errors.terms_accepted" class="error-base">{{ form.errors.terms_accepted }}</p>
+                            <p v-if="form.errors['customer.create_account']" class="error-base">{{ form.errors['customer.create_account'] }}</p>
+                            <p v-if="form.errors.customer_id" class="error-base">{{ form.errors.customer_id }}</p>
 
                         </div>
 

@@ -18,6 +18,7 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
+            'guid' => $this->faker->uuid(),
             'name' => $this->faker->words(3, true),
             'type' => $this->faker->randomElement(['tent pitch', 'caravan pitch', 'cabin', 'RV spot']),
             'description' => $this->faker->paragraph(),

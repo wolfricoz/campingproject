@@ -23,7 +23,7 @@ class BookingController extends Controller
             //            dd($customer);
         }
 
-        return Inertia::render('booking', [
+        return Inertia::render('Booking', [
             'customer' => $customer,
             'locations' => Location::where('status', 1)->get(),
             'canLogin' => (Route::has('login') && ! auth()->check()),

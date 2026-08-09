@@ -102,35 +102,35 @@ function save() {
                 <!-- === Algemeen === -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Naam') }}</label>
+                        <label class="label-base">* {{ __('Naam') }}</label>
                         <input type="text" v-model="form.name"
-                               class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                               class="w-full input-base"
                                required
                         />
-                        <p v-if="errors.name" class="mt-1 text-xs text-red-600">{{ errors.name[0] }}</p>
+                        <p v-if="errors.name" class="error-base">{{ errors.name[0] }}</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Type') }}</label>
+                        <label class="label-base">{{ __('Type') }}</label>
                         <input type="text" v-model="form.type" :placeholder="__('Bijv. chalet, caravanplaats')"
-                               class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                               class="w-full input-base"
                         />
-                        <p v-if="errors.type" class="mt-1 text-xs text-red-600">{{ errors.type[0] }}</p>
+                        <p v-if="errors.type" class="error-base">{{ errors.type[0] }}</p>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Beschrijving') }}</label>
+                        <label class="label-base">{{ __('Beschrijving') }}</label>
                         <textarea v-model="form.description" rows="3"
-                                  class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                  class="w-full input-base"
                         ></textarea>
-                        <p v-if="errors.description" class="mt-1 text-xs text-red-600">{{ errors.description[0] }}</p>
+                        <p v-if="errors.description" class="error-base">{{ errors.description[0] }}</p>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Foto') }}</label>
+                        <label class="label-base">{{ __('Foto') }}</label>
                         <div class="flex gap-4">
                             <input type="text" v-model="form.photo" placeholder="/images/chalet.jpg"
-                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="flex-1 input-base"
                             />
                             <img v-if="form.photo" :src="form.photo" alt=""
                                  class="h-16 w-24 rounded-lg object-cover object-center"/>
@@ -139,7 +139,7 @@ function save() {
                                 {{ __('Geen foto') }}
                             </div>
                         </div>
-                        <p v-if="errors.photo" class="mt-1 text-xs text-red-600">{{ errors.photo[0] }}</p>
+                        <p v-if="errors.photo" class="error-base">{{ errors.photo[0] }}</p>
                     </div>
                 </div>
 
@@ -148,33 +148,33 @@ function save() {
                     <h3 class="text-sm font-semibold text-gray-800 mb-3">{{ __('Eigenschappen') }}</h3>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Capaciteit') }}</label>
+                            <label class="label-base">{{ __('Capaciteit') }}</label>
                             <input type="number" v-model.number="form.capacity" min="1"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="w-full input-base"
                             />
-                            <p v-if="errors.capacity" class="mt-1 text-xs text-red-600">{{ errors.capacity[0] }}</p>
+                            <p v-if="errors.capacity" class="error-base">{{ errors.capacity[0] }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Slaapkamers') }}</label>
+                            <label class="label-base">* {{ __('Slaapkamers') }}</label>
                             <input type="number" v-model.number="form.bedrooms" min="0"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="w-full input-base"
                                    required
                             />
-                            <p v-if="errors.bedrooms" class="mt-1 text-xs text-red-600">{{ errors.bedrooms[0] }}</p>
+                            <p v-if="errors.bedrooms" class="error-base">{{ errors.bedrooms[0] }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Grootte (m²)') }}</label>
+                            <label class="label-base">{{ __('Grootte (m²)') }}</label>
                             <input type="number" v-model.number="form.size" min="0" step="0.01"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="w-full input-base"
                             />
-                            <p v-if="errors.size" class="mt-1 text-xs text-red-600">{{ errors.size[0] }}</p>
+                            <p v-if="errors.size" class="error-base">{{ errors.size[0] }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Prijs/nacht') }}</label>
+                            <label class="label-base">{{ __('Prijs/nacht') }}</label>
                             <input type="number" v-model.number="form.price_per_night" min="0" step="0.01"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="w-full input-base"
                             />
-                            <p v-if="errors.price_per_night" class="mt-1 text-xs text-red-600">{{ errors.price_per_night[0] }}</p>
+                            <p v-if="errors.price_per_night" class="error-base">{{ errors.price_per_night[0] }}</p>
                         </div>
                     </div>
 
@@ -204,7 +204,7 @@ function save() {
                 <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-gray-700">{{ __('Status') }}:</span>
                     <select v-model.number="form.status"
-                            class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            class="input-base">
                         <option :value="1">{{ __('Actief') }}</option>
                         <option :value="0">{{ __('Inactief') }}</option>
                     </select>

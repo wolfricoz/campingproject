@@ -63,6 +63,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     {{ __('Locaties') }}
                                 </NavLink>
+                                <NavLink
+                                    :href="route('news.index')"
+                                    :active="route().current('news.index')"
+                                >
+                                    {{ __('Nieuws') }}
+                                </NavLink>
 
                             </div>
                         </div>

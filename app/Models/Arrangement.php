@@ -2,15 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Arrangement extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected $guarded = [];
+
+    /**
+     * The auto-incrementing id stays the primary key; only `guid` gets a UUID.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['guid'];
+    }
 
     /**
      * @return array<string, string>

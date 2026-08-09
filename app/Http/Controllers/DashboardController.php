@@ -28,7 +28,7 @@ class DashboardController extends Controller
                 ->orderByDesc('created_at')
                 ->get();
 
-            return Inertia::render('Dashboard/Customer', [
+            return Inertia::render('Customer/Dashboard', [
                 'reservations' => $reservations,
 
             ]);
@@ -48,7 +48,7 @@ class DashboardController extends Controller
             ->get();
 
         // dd($arrangements);
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Admin/Dashboard', [
             'arrangements' => $arrangements,
         ]);
     }

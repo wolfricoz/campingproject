@@ -15,6 +15,25 @@ body{
 .table-base {
     @apply border border-gray-200 rounded-md p-2;
 }
+
+/* Formulieropmaak. Bewust zonder breedte, zodat w-full, flex-1 of een kolomspan
+   per veld in de markup bepaald blijft worden. */
+.input-base {
+    @apply rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500;
+}
+
+.label-base {
+    @apply mb-1 block text-sm font-medium text-gray-700;
+}
+
+.error-base {
+    @apply mt-1 text-xs text-red-600;
+}
+
+/* De witte kaart waar de publieke pagina's hun inhoud in zetten. */
+.card-base {
+    @apply rounded-2xl bg-white p-6 shadow-lg sm:p-8;
+}
 .positive-button {
     @apply px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white transition-colors hover:bg-emerald-700 disabled:bg-emerald-600/40 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:bg-emerald-600/40;
 }

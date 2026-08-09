@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\NewsFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Location extends Model
+class News extends Model
 {
+    /** @use HasFactory<NewsFactory> */
     use HasFactory, HasUuids;
 
     protected $guarded = [];

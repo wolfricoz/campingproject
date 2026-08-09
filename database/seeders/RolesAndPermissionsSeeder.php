@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
@@ -27,6 +27,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'check out bookings',
             'approve bookings',
             'reject bookings',
+            'manage news',
         ];
 
         foreach ($permissions as $permission) {
@@ -56,6 +57,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'check in bookings',
             'check out bookings',
             'create booking',
+            'manage news',
         ]);
 
         // Administrator — everything the receptionist can do, plus approve/reject

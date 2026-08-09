@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Arrangement;
 use App\Models\User;
-use Database\Factories\ArrangementFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -19,10 +18,21 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
         $this->call(RolesAndPermissionsSeeder::class);
+
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@syntec-camping.nl',
+            'password' => bcrypt('admin'),
+        ])->assignRole('administrator');
+
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'password' => bcrypt('user'),
+
         ]);
         Arrangement::factory(10)->create();
+
+        $this->call(NewsSeeder::class);
     }
 }

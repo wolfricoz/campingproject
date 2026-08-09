@@ -50,7 +50,7 @@ function formatDate(date) {
     <Head :title="__('Reserveringen')" />
     <GuestLayout :canLogin="canLogin" :canRegister="canRegister"  >
         <div class="px-4 py-10">
-            <div class="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-lg sm:p-8 h-[100%]">
+            <div class="mx-auto max-w-3xl card-base h-[100%]">
                 <h1 class="title-class">{{ __('Reserveringen') }}</h1>
 
                 <div class="mt-6 flex flex-col divide-y divide-gray-200 border border-gray-200 rounded-lg">

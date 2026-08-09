@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Mail\NewAccountMail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
@@ -11,10 +12,20 @@ use Illuminate\Support\Str;
 
 class Customer extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     //
     protected $guarded = [];
+
+    /**
+     * The auto-incrementing id stays the primary key; only `guid` gets a UUID.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['guid'];
+    }
 
     public static function findByEmailAndPhoneNumber($email, $phone_number): ?self
     {

@@ -280,9 +280,9 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                 <!-- === Booking fields === -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Klant') }}</label>
+                        <label class="label-base">* {{ __('Klant') }}</label>
                         <select v-model="form.customer_id"
-                                class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                class="w-full input-base"
                                 required
                         >
                             <option :value="null">{{ __('— Selecteer klant —') }}</option>
@@ -292,9 +292,9 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Locatie') }}</label>
+                        <label class="label-base">* {{ __('Locatie') }}</label>
                         <select v-model="form.location_id"
-                                class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                class="w-full input-base"
                                 required
                         >
                             <option :value="null">{{ __('— Selecteer locatie —') }}</option>
@@ -303,28 +303,28 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Startdatum') }}</label>
+                        <label class="label-base">* {{ __('Startdatum') }}</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="startDatePart"
-                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="flex-1 input-base"
                                    required
                             />
                             <input type="time" v-model="startTimePart" step="60"
-                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="input-base"
                                    required
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Einddatum') }}</label>
+                        <label class="label-base">* {{ __('Einddatum') }}</label>
                         <div class="flex gap-2">
                             <input type="date" v-model="endDatePart" :min="startDatePart"
-                                   class="flex-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="flex-1 input-base"
                                    required
                             />
                             <input type="time" v-model="endTimePart" step="60"
-                                   class="rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="input-base"
                                    required
                             />
                         </div>
@@ -385,25 +385,25 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     <h3 class="text-sm font-semibold text-gray-800 mb-3">{{ __('Klantgegevens') }}</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Naam') }}</label>
+                            <label class="label-base">* {{ __('Naam') }}</label>
                             <input type="text" v-model="form.customer.name"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="w-full input-base"
                                    required
 
                             />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('E-mail') }}</label>
+                            <label class="label-base">* {{ __('E-mail') }}</label>
                             <input type="email" v-model="form.customer.email"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="w-full input-base"
                                    required
 
                             />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Telefoonnummer') }}</label>
+                            <label class="label-base">* {{ __('Telefoonnummer') }}</label>
                             <input type="tel" v-model="form.customer.phone_number"
-                                   class="w-full rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="w-full input-base"
                                    required
 
                             />
@@ -411,26 +411,26 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     </div>
 
                     <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">* {{ __('Adres') }}</label>
+                        <label class="label-base">* {{ __('Adres') }}</label>
                         <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
                             <input type="text" v-model="form.customer.street_name" :placeholder="__('Straat')"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="col-span-2 sm:col-span-3 input-base"
                                    required
                             />
                             <input type="text" v-model="form.customer.street_number" :placeholder="__('Nr.')"
-                                   class="sm:col-span-1 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="sm:col-span-1 input-base"
                                    required
                             />
                             <input type="text" v-model="form.customer.postal_code" :placeholder="__('Postcode')"
-                                   class="sm:col-span-2 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="sm:col-span-2 input-base"
                                    required
                             />
                             <input type="text" v-model="form.customer.city" :placeholder="__('Plaats')"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="col-span-2 sm:col-span-3 input-base"
                                    required
                             />
                             <input type="text" v-model="form.customer.country" :placeholder="__('Land')"
-                                   class="col-span-2 sm:col-span-3 rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                   class="col-span-2 sm:col-span-3 input-base"
                                    required
                             />
                         </div>

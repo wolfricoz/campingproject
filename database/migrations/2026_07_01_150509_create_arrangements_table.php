@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('arrangements', function (Blueprint $table) {
             $table->id();
-            $table->uuid('guid')->unique()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('guid')->unique();
             $table->timestamps();
             $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete();
             $table->foreignId('location_id')->constrained('locations')->cascadeOnDelete();
@@ -25,7 +25,6 @@ return new class extends Migration
             $table->boolean('confirmation_email_sent')->default(false);
             $table->boolean('payment_received')->default(false);
             $table->integer('status')->default(1);
-
 
         });
     }

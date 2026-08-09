@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArrangementController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->name('api.')->group(function () {
@@ -23,6 +24,11 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::name('locations.')->prefix('locations')->group(function () {
 
         Route::post('/store', [LocationController::class, 'store'])->name('store');
+    });
+
+    Route::name('news.')->prefix('news')->group(function () {
+
+        Route::post('/store', [NewsController::class, 'store'])->name('store');
     });
 });
 

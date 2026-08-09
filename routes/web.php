@@ -6,12 +6,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontEndController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Location;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-# === Customer Facing Routes
+
+// === Customer Facing Routes
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => (Route::has('login') && ! auth()->check()),
@@ -21,9 +23,9 @@ Route::get('/', function () {
 })->name('home');
 Route::get('/about', [FrontEndController::class, 'about'])->name('about');
 Route::get('/contact', [FrontEndController::class, 'contact'])->name('contact');
+Route::post('/contact', [FrontEndController::class, 'store'])->name('contact.store');
 Route::get('/locations', [FrontEndController::class, 'locations'])->name('locations');
-
-
+Route::get('/news', [NewsController::class, 'index'])->name('news');
 
 Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 Route::get('/booking', [BookingController::class, 'index'])->name('booking');
@@ -39,6 +41,9 @@ Route::group(['middleware' => ['auth', 'permission:access dashboard'], 'prefix' 
 
         Route::get('/location', [LocationController::class, 'adminIndex'])->middleware(['auth', 'verified', 'role:administrator'])
             ->name('locations.index');
+
+        Route::get('/news', [NewsController::class, 'admin'])->middleware(['auth', 'verified', 'permission:manage news'])
+            ->name('news.index');
 
     });
 

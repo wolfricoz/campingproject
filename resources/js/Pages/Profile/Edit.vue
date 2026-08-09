@@ -25,9 +25,7 @@ defineProps({
                     {{ __('Profile') }}
                 </h2>
 
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
+                <div class="card-base">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
@@ -35,15 +33,11 @@ defineProps({
                     />
                 </div>
 
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
+                <div class="card-base">
                     <UpdatePasswordForm class="max-w-xl" />
                 </div>
 
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
+                <div class="card-base">
                     <DeleteUserForm class="max-w-xl" />
                 </div>
             </div>

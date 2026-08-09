@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->uuid('guid')->unique()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('guid')->unique();
             $table->timestamps();
             $table->string('name');
             $table->string('email');
