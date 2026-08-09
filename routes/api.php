@@ -24,6 +24,11 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::name('locations.')->prefix('locations')->group(function () {
 
         Route::post('/store', [LocationController::class, 'store'])->name('store');
+
+        // The public booking page needs to check availability too, so this one runs without auth.
+        Route::post('/available', [LocationController::class, 'checkAvailability'])
+            ->withoutMiddleware('auth:sanctum')
+            ->name('available');
     });
 
     Route::name('news.')->prefix('news')->group(function () {

@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -61,6 +62,16 @@ class ArrangementController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
+
+        // An occupied location may never be booked twice; when editing, the arrangement
+        // itself must not count as an occupant.
+        $ignoreArrangementId = $data['id'] === 0 ? null : $data['id'];
+
+        if (! Location::isAvailable($data['location_id'], $data['start_date'], $data['end_date'], $ignoreArrangementId)) {
+            throw ValidationException::withMessages([
+                'location_id' => __('Deze locatie is in de gekozen periode al bezet.'),
+            ]);
+        }
 
         $days = (new daysCalculator)
             ->setStart(new \DateTime($data['start_date']))

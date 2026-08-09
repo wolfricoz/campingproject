@@ -124,11 +124,70 @@ const selectedLocation = computed(() =>
     locations.value.find((l) => l.id === form.value.location_id) ?? null
 );
 
+// === Beschikbaarheid ===
+// Validatiefouten van de backend, per veld één melding.
+const errors = ref({});
+const availability = ref({checking: false, available: null, message: ''});
+
+// Alles wat niet expliciet beschikbaar is blokkeert het opslaan: de endpoint meldt zo
+// zowel een bezette locatie als een datum in het verleden.
+const isUnavailable = computed(() =>
+    availability.value.available !== true && !!availability.value.message
+);
+
+let availabilityTimer = null;
+
+function checkAvailability() {
+    if (!form.value.location_id || !form.value.start_date || !form.value.end_date) {
+        availability.value = {checking: false, available: null, message: ''};
+        return;
+    }
+
+    availability.value = {checking: true, available: null, message: ''};
+
+    axios.post(route('api.locations.available'), {
+        location_id: form.value.location_id,
+        start_date: form.value.start_date,
+        end_date: form.value.end_date,
+        arrangement_id: form.value.id || null, // bij bewerken mag de reservering zichzelf niet blokkeren
+    }).then(response => {
+        const available = response.data.available === true;
+        availability.value = {
+            checking: false,
+            available: available,
+            // De melding komt van de backend, die weet waarom het niet kan. De vertaalsleutels
+            // zijn de Nederlandse teksten, dus we halen hem alsnog door __() heen.
+            message: available ? '' : __(response.data.message ?? 'Deze locatie is in de gekozen periode al bezet.'),
+        };
+        if (available) {
+            delete errors.value.location_id;
+        }
+    }).catch(error => {
+        availability.value = {checking: false, available: null, message: ''};
+        console.log(error);
+    });
+}
+
+// De gebruiker typt datums, dus we wachten even voordat we de server bevragen.
+watch(() => [form.value.location_id, form.value.start_date, form.value.end_date], () => {
+    availability.value = {checking: false, available: null, message: ''};
+    clearTimeout(availabilityTimer);
+    availabilityTimer = setTimeout(checkAvailability, 300);
+}, {immediate: true});
+
 function close() {
     emit('close');
 }
 
 async function save() {
+    errors.value = {};
+
+    // Een bezette locatie mag niet worden opgeslagen; we blokkeren de aanvraag hier al.
+    if (isUnavailable.value) {
+        errors.value = {location_id: availability.value.message};
+        return;
+    }
+
     // save the changes
     try {
 
@@ -145,11 +204,27 @@ async function save() {
         emit('save', {...form.value});
 
     } catch (error) {
+        // 422 betekent dat de backend de reservering heeft afgekeurd (bijv. bezette locatie).
+        if (error.response?.status === 422) {
+            const responseErrors = error.response.data?.errors ?? {};
+            errors.value = Object.fromEntries(
+                Object.entries(responseErrors).map(([field, messages]) => [field, [].concat(messages)[0]])
+            );
+            if (responseErrors.location_id) {
+                availability.value = {checking: false, available: false};
+            }
+            return;
+        }
         console.log(error);
 
     }
 }
 function changeStatus(status){
+    // Zonder bestaande reservering valt er geen status te wijzigen.
+    if (!props.arrangement) {
+        return;
+    }
+
     // As a safety, we will prompt a confirm for certain statusses (eg. cancel)
     if (status === 'cancelled' || status === 'rejected') {
         let result = confirm(__('Weet je zeker dat je deze reservering wilt :status?', {status: __(status)}))
@@ -277,6 +352,15 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
             </div>
 
             <div class="px-6 py-4 space-y-6">
+                <!-- Algemene foutmelding wanneer de backend de reservering afkeurt -->
+                <div v-if="Object.keys(errors).length"
+                     class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                    <p class="font-medium">{{ __('Er ging iets mis. Controleer de gemarkeerde velden:') }}</p>
+                    <ul class="mt-1 list-inside list-disc">
+                        <li v-for="(message, field) in errors" :key="field">{{ message }}</li>
+                    </ul>
+                </div>
+
                 <!-- === Booking fields === -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -295,11 +379,22 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                         <label class="label-base">* {{ __('Locatie') }}</label>
                         <select v-model="form.location_id"
                                 class="w-full input-base"
+                                :class="{'border-red-500': isUnavailable}"
                                 required
                         >
                             <option :value="null">{{ __('— Selecteer locatie —') }}</option>
                             <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
                         </select>
+                        <p v-if="errors.location_id" class="error-base">{{ errors.location_id }}</p>
+                        <p v-else-if="availability.checking" class="mt-1 text-xs text-gray-500">
+                            {{ __('Beschikbaarheid controleren…') }}
+                        </p>
+                        <p v-else-if="isUnavailable" class="error-base">
+                            {{ availability.message }}
+                        </p>
+                        <p v-else-if="availability.available" class="mt-1 text-xs text-emerald-600">
+                            {{ __('Deze locatie is beschikbaar in de gekozen periode.') }}
+                        </p>
                     </div>
 
                     <div>
@@ -344,9 +439,11 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                           :class="form.payment_received ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
                         {{ form.payment_received ? __('Ja') : __('Nee') }}
                     </span>
-                    <span class="text-sm font-medium text-gray-700">{{ __('Reservering status') }}:</span>
-                    <span class="text-sm px-2 py-0.5 rounded-full"
-                          :class="{
+                    <!-- Een nieuwe reservering heeft nog geen status, dus dan tonen we het label niet. -->
+                    <template v-if="arrangement">
+                        <span class="text-sm font-medium text-gray-700">{{ __('Reservering status') }}:</span>
+                        <span class="text-sm px-2 py-0.5 rounded-full"
+                              :class="{
         'bg-gray-100 border-gray-400':      arrangement.booking_status === 'pending',
         'bg-orange-100 border-orange-500':  arrangement.booking_status === 'confirmed',
         'bg-emerald-100 border-emerald-500': arrangement.booking_status === 'checked-in',
@@ -354,8 +451,9 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
         'bg-red-100 border-red-500':        arrangement.booking_status === 'cancelled',
         'bg-rose-100 border-rose-500':      arrangement.booking_status === 'rejected',
     }">
-                        {{ __(arrangement.booking_status) }}
-                    </span>
+                            {{ __(arrangement.booking_status) }}
+                        </span>
+                    </template>
                 </div>
 <!--            === Locatie gegevens ===    -->
                 <div class="border border-gray-200 rounded-xl p-4 bg-gray-50">
@@ -436,7 +534,7 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                         </div>
                     </div>
 
-                    <label class="flex items-center gap-2 mt-4 text-sm text-gray-700" v-if="!arrangement?.customer.user_id">
+                    <label class="flex items-center gap-2 mt-4 text-sm text-gray-700" v-if="!arrangement?.customer?.user_id">
                         <input type="checkbox" v-model="form.customer.create_account"
                                class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                         />
@@ -479,7 +577,9 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     >
                         {{ __('Afwijzen') }}
                     </button>
-                    <button class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700" @click="save">
+                    <button class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            :disabled="isUnavailable || availability.checking"
+                            @click="save">
                         {{ props.arrangement ? __('Bijwerken') : __('Opslaan') }}
                     </button>
                     <button class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700" @click="changeStatus('cancelled')"

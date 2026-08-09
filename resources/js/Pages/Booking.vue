@@ -3,6 +3,7 @@ import {Head, Link, useForm} from '@inertiajs/vue3';
 import {computed, ref, watch} from 'vue';
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 import Checkbox from "@/Components/Checkbox.vue";
+import {__} from '@/translate';
 
 const props = defineProps({
     customer: {
@@ -101,6 +102,13 @@ const endTimePart = computed({
 
 const hasErrors = computed(() => Object.keys(form.errors).length > 0);
 
+// Klanten mogen niet in het verleden boeken, dus de datumvelden beginnen bij vandaag.
+const today = computed(() => {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+});
+
 // De einddatum mag nooit voor de startdatum liggen, dus we schuiven hem mee.
 watch(() => form.start_date, () => {
     if (form.end_date && form.end_date < form.start_date) {
@@ -145,8 +153,68 @@ function fetchPrice() {
 watch(() => [form.start_date, form.end_date], fetchDays, {immediate: true});
 watch(() => [form.location_id, days.value], fetchPrice);
 
+// === Beschikbaarheid ===
+const availability = ref({checking: false, available: null, message: ''});
+
+// Alles wat niet expliciet beschikbaar is blokkeert de aanvraag: de endpoint meldt zo
+// zowel een bezette locatie als een datum in het verleden.
+const isUnavailable = computed(() =>
+    availability.value.available !== true && !!availability.value.message
+);
+
+let availabilityTimer = null;
+
+function checkAvailability() {
+    if (!form.location_id || !form.start_date || !form.end_date) {
+        availability.value = {checking: false, available: null, message: ''};
+        return;
+    }
+
+    availability.value = {checking: true, available: null, message: ''};
+
+    axios.post(route('api.locations.available'), {
+        location_id: form.location_id,
+        start_date: form.start_date,
+        end_date: form.end_date,
+    }).then(response => {
+        const available = response.data.available === true;
+        availability.value = {
+            checking: false,
+            available: available,
+            // De melding komt van de backend, die weet waarom het niet kan. De vertaalsleutels
+            // zijn de Nederlandse teksten, dus we halen hem alsnog door __() heen.
+            message: available ? '' : __(response.data.message ?? 'Deze locatie is in de gekozen periode al bezet.'),
+        };
+        if (available) {
+            form.clearErrors('location_id');
+        }
+    }).catch(error => {
+        availability.value = {checking: false, available: null, message: ''};
+        console.log(error);
+    });
+}
+
+// De gebruiker typt datums, dus we wachten even voordat we de server bevragen.
+watch(() => [form.location_id, form.start_date, form.end_date], () => {
+    availability.value = {checking: false, available: null, message: ''};
+    clearTimeout(availabilityTimer);
+    availabilityTimer = setTimeout(checkAvailability, 300);
+}, {immediate: true});
+
 function submit() {
-    form.post(route('booking.store'));
+    // Een bezette locatie mag niet worden opgeslagen; we blokkeren de aanvraag hier al.
+    if (isUnavailable.value) {
+        form.setError('location_id', availability.value.message);
+        return;
+    }
+
+    form.post(route('booking.store'), {
+        onError: (errors) => {
+            if (errors.location_id) {
+                availability.value = {checking: false, available: false, message: errors.location_id};
+            }
+        },
+    });
 
     // try {
     //     const customerRes = await axios.post(route('api.customers.store'), form.value);
@@ -198,17 +266,27 @@ function submit() {
                             <div class="sm:col-span-3">
                                 <label class="label-base">{{ __('Locatie') }} <span class="text-red-600">*</span></label>
                                 <select v-model="form.location_id"
-                                        class="w-full input-base">
+                                        class="w-full input-base"
+                                        :class="{'border-red-500': isUnavailable}">
                                     <option :value="null">{{ __('— Selecteer een locatie —') }}</option>
                                     <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
                                 </select>
                                 <p v-if="form.errors.location_id" class="error-base">{{ form.errors.location_id }}</p>
+                                <p v-else-if="availability.checking" class="mt-1 text-xs text-gray-500">
+                                    {{ __('Beschikbaarheid controleren…') }}
+                                </p>
+                                <p v-else-if="isUnavailable" class="error-base">
+                                    {{ availability.message }}
+                                </p>
+                                <p v-else-if="availability.available" class="mt-1 text-xs text-emerald-600">
+                                    {{ __('Deze locatie is beschikbaar in de gekozen periode.') }}
+                                </p>
                             </div>
 
                             <div>
                                 <label class="label-base">{{ __('Aankomst') }} <span class="text-red-600">*</span></label>
                                 <div class="flex gap-2">
-                                    <input type="date" v-model="startDatePart"
+                                    <input type="date" v-model="startDatePart" :min="today"
                                            class="flex-1 input-base"/>
                                     <input type="time" v-model="startTimePart" step="60"
                                            class="input-base"/>
@@ -218,7 +296,7 @@ function submit() {
                             <div>
                                 <label class="label-base">{{ __('Vertrek') }} <span class="text-red-600">*</span></label>
                                 <div class="flex gap-2">
-                                    <input type="date" v-model="endDatePart" :min="startDatePart"
+                                    <input type="date" v-model="endDatePart" :min="startDatePart || today"
                                            class="flex-1 input-base"/>
                                     <input type="time" v-model="endTimePart" step="60"
                                            class="input-base"/>
@@ -316,8 +394,9 @@ function submit() {
 
                         <div class="flex flex-col border-t border-gray-100 pt-6">
 
-                            <button :disabled="!form.terms_accepted" type="button" @click="submit"
-                                    class="w-full positive-button">
+                            <button :disabled="!form.terms_accepted || isUnavailable || availability.checking || form.processing"
+                                    type="button" @click="submit"
+                                    class="w-full positive-button disabled:opacity-50 disabled:cursor-not-allowed">
                                 {{ __('Reservering aanvragen') }}
                             </button>
                         </div>

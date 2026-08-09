@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class LocationController extends Controller
@@ -46,5 +48,34 @@ class LocationController extends Controller
 
         return response()->json(['success' => true, 'updated_data' => $location]);
 
+    }
+
+    /**
+     * Tells the front-end whether a location is still free for the given period, so the
+     * booking form can warn before it is submitted.
+     */
+    public function checkAvailability(Request $request): JsonResponse
+    {
+        $arrangementData = $request->validate([
+            'location_id' => 'required|integer|exists:locations,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'arrangement_id' => 'nullable|integer',
+        ]);
+        $today = date('Y-m-d H:i:s');
+
+        if ($arrangementData['start_date'] < $today) {
+            return response()->json(['success' => false, 'message' => 'Je kan geen datum in het verleden kiezen']);
+        }
+
+        return response()->json([
+            'available' => Location::isAvailable(
+                $arrangementData['location_id'],
+                $arrangementData['start_date'],
+                $arrangementData['end_date'],
+                $arrangementData['arrangement_id'] ?? null,
+            ),
+            'message' => 'Deze locatie is al in gebruik op deze datum!',
+        ]);
     }
 }

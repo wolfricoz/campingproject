@@ -10,6 +10,7 @@ use App\Services\PriceCalculator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -47,6 +48,21 @@ class BookingController extends Controller
             'customer.create_account' => 'required|boolean',
         ]);
 
+        $arrangementData = $request->validate([
+
+            'location_id' => 'required|integer',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        // An occupied location may never be booked twice. This runs before the customer is
+        // created, otherwise a rejected booking would still leave a customer behind.
+        if (! Location::isAvailable($arrangementData['location_id'], $arrangementData['start_date'], $arrangementData['end_date'])) {
+            throw ValidationException::withMessages([
+                'location_id' => __('Deze locatie is in de gekozen periode al bezet.'),
+            ]);
+        }
+
         $data = $customerData['customer'];
 
         // Clean up the data
@@ -56,13 +72,6 @@ class BookingController extends Controller
         // if no customer is found, we check on the e-mail and phone number; if they match we use that customer to
         // prevent database polution.
         $customerResult = Customer::createNewCustomer($data);
-
-        $arrangementData = $request->validate([
-
-            'location_id' => 'required|integer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-        ]);
 
         $days = (new daysCalculator)
             ->setStart(new \DateTime($arrangementData['start_date']))
