@@ -13,20 +13,25 @@ class CustomerFactory extends Factory
     /**
      * Define the model's default state.
      *
+     * De gasten zijn overwegend Nederlands, dus de adresgegevens komen uit de nl_NL
+     * faker in plaats van de Amerikaanse standaard.
+     *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
+        $dutchFaker = fake('nl_NL');
+
         return [
             'guid' => $this->faker->uuid(),
-            'name' => $this->faker->name(),
+            'name' => $dutchFaker->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'phone_number' => $this->faker->phoneNumber(),
-            'street_name' => $this->faker->streetName(),
-            'street_number' => $this->faker->buildingNumber(),
-            'postal_code' => $this->faker->postcode(),
-            'city' => $this->faker->city(),
-            'country' => $this->faker->country(),
+            'phone_number' => '06-'.$this->faker->numerify('########'),
+            'street_name' => $dutchFaker->streetName(),
+            'street_number' => (string) $this->faker->numberBetween(1, 180),
+            'postal_code' => $this->faker->numberBetween(1011, 9999).' '.$this->faker->regexify('[A-Z]{2}'),
+            'city' => $dutchFaker->city(),
+            'country' => $this->faker->randomElement(['Nederland', 'Nederland', 'Nederland', 'België', 'Duitsland']),
             'user_id' => null,
             'status' => 1,
         ];
