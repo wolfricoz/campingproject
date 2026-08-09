@@ -10,6 +10,14 @@ const props = defineProps({
     arrangement: {
         type: Object,
         required: true
+    },
+    continuesLeft: {
+        type: Boolean,
+        default: false
+    },
+    continuesRight: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -62,8 +70,9 @@ function formatDate(date) {
 
 <template>
     <div
-        class="rounded-lg px-2 py-1 text-center shadow-sm border-l-4 transition-colors hover:brightness-95"
-        :class="{
+        class="cursor-pointer overflow-hidden px-2 py-1 shadow-sm transition-colors hover:brightness-95"
+        :class="[
+        {
         'bg-gray-100 border-gray-400':      arrangement.booking_status === 'pending',
         'bg-orange-100 border-orange-500':  arrangement.booking_status === 'confirmed',
         'bg-emerald-100 border-emerald-500': arrangement.booking_status === 'checked-in',
@@ -71,22 +80,35 @@ function formatDate(date) {
         'bg-blue-100 border-blue-500':      arrangement.booking_status === 'finished',
         'bg-red-100 border-red-500':        arrangement.booking_status === 'cancelled',
         'bg-red-100 border-rose-500':      arrangement.booking_status === 'rejected',
-    }"
+        },
+
+        continuesLeft ? 'pl-2' : 'ml-1 rounded-l-lg border-l-4',
+        continuesRight ? '' : 'mr-1 rounded-r-lg',
+    ]"
+        :title="`${arrangement.location.name} — ${arrangement.customer.name}\n${formatDate(arrangement.start_date)} – ${formatDate(arrangement.end_date)}`"
         @click="showModal = true"
     >
-        <h3 class="truncate whitespace-nowrap w-full text-sm font-medium text-gray-800">
-            {{ arrangement.location.name }}
-        </h3>
-        <p class="truncate text-xs text-gray-600">{{ arrangement.customer.name }}</p>
-        <div class="mt-0.5 text-[11px] text-gray-500">
-            <span>{{ formatDate(arrangement.start_date) }}</span> – <span>{{ formatDate(arrangement.end_date) }}</span>
-        </div>
+        <template v-if="!continuesLeft">
+            <h3 class="truncate whitespace-nowrap w-full text-sm font-medium text-gray-800">
+                {{ arrangement.location.name }}
+            </h3>
+            <p class="truncate text-xs text-gray-600">{{ arrangement.customer.name }}</p>
+            <div class="truncate text-[11px] text-gray-500">
+                <span>{{ formatDate(arrangement.start_date) }}</span> – <span>{{ formatDate(arrangement.end_date) }}</span>
+            </div>
+        </template>
+        <!-- Vervolg van vorige week: alleen de kleur, de gegevens staan al aan het begin. -->
+        <p v-else class="truncate text-xs italic text-gray-600">
+            {{ __('vervolg') }} — {{ arrangement.customer.name }}
+        </p>
     </div>
-    <div v-if="showModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20" >
-        <arrangement-modal :arrangement="arrangement" :show-modal="showModal" @close="showModal = false" @save="onSave" @change-status="onChangeStatus">
+    <Teleport to="body">
+        <div v-if="showModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20 z-50" >
+            <arrangement-modal :arrangement="arrangement" :show-modal="showModal" @close="showModal = false" @save="onSave" @change-status="onChangeStatus">
 
-        </arrangement-modal>
-    </div>
+            </arrangement-modal>
+        </div>
+    </Teleport>
 </template>
 
 <style scoped>

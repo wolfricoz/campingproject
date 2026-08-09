@@ -36,11 +36,17 @@ class Arrangement extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Customer, $this>
+     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /**
+     * @return BelongsTo<Location, $this>
+     */
     public function location(): BelongsTo
     {
         return $this->BelongsTo(Location::class);

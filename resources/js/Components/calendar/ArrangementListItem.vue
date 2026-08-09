@@ -114,10 +114,13 @@ function formatDate(date) {
         </div>
     </div>
 
-    <div v-if="showModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20">
-        <arrangement-modal :arrangement="arrangement" :show-modal="showModal"
-                           @close="showModal = false" @save="onSave" @change-status="onChangeStatus" />
-    </div>
+
+    <Teleport to="body">
+        <div v-if="showModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20 z-50">
+            <arrangement-modal :arrangement="arrangement" :show-modal="showModal"
+                               @close="showModal = false" @save="onSave" @change-status="onChangeStatus" />
+        </div>
+    </Teleport>
 </template>
 
 <style scoped>

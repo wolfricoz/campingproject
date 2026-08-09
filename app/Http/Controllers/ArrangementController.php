@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -104,13 +105,13 @@ class ArrangementController extends Controller
     public function update(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'id' => 'required|integer',
-            'status' => 'required|string',
+            'id' => 'required|integer|exists:arrangements,id',
+            'status' => ['required', Rule::enum(ArrangementStatus::class)],
         ]);
-        if (! ArrangementStatus::tryFrom($data['status']) !== null) {
-            return response()->json(['status' => 'Status does not exist.']);
-        }
-        $result = Arrangement::update(['id' => $data['id']], $data);
+
+        // The enum belongs in `booking_status`; the `status` column is the active flag.
+        $result = Arrangement::findOrFail($data['id']);
+        $result->update(['booking_status' => $data['status']]);
 
         return response()->json(['status' => 'success!', 'updated_data' => $result]);
 
