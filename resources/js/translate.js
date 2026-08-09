@@ -1,8 +1,6 @@
 import { usePage } from '@inertiajs/vue3';
 
 export function __(key, replacements = {}) {
-    // Bewust || in plaats van ??: een nog niet ingevulde vertaling ("") moet ook
-    // terugvallen op de sleutel, anders krijg je een lege regel in beeld.
     let line = usePage().props.translations?.[key] || key;
 
     Object.entries(replacements).forEach(([placeholder, value]) => {

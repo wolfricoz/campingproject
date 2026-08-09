@@ -127,7 +127,7 @@ const showCreateModal = ref(false);
 
 <template>
     <Head :title="__('Alle reserveringen')"/>
-    <div v-if="showCreateModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20" >
+    <div v-if="showCreateModal" class="flex justify-center items-center fixed top-0 left-0 w-full h-full bg-black/20 z-50" >
         <arrangement-modal :show-modal="showCreateModal" @close="showCreateModal = false" @save="onSave">
 
         </arrangement-modal>

@@ -5,10 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * Het contactformulier op de publieke site. Het versturen van het bericht moet nog
- * gebouwd worden; deze test dekt de route en de validatie.
- */
 class ContactFormTest extends TestCase
 {
     use RefreshDatabase;

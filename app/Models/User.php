@@ -17,8 +17,6 @@ class User extends Authenticatable
     use HasFactory, HasRoles, HasUuids, Notifiable;
 
     /**
-     * The auto-incrementing id stays the primary key; only `guid` gets a UUID.
-     *
      * @return list<string>
      */
     public function uniqueIds(): array

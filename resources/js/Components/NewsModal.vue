@@ -20,7 +20,6 @@ const form = ref({
     published: false,
 });
 
-// De afbeelding gaat als bestand mee, dus die houden we los van de rest van het formulier.
 const image = ref(null);
 const imagePreview = ref('');
 const errors = ref({});
@@ -70,7 +69,6 @@ function save() {
     errors.value = {};
     processing.value = true;
 
-    // Multipart, want de afbeelding wordt als bestand geüpload.
     const payload = new FormData();
     payload.append('id', form.value.id);
     payload.append('title', form.value.title);

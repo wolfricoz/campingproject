@@ -27,6 +27,22 @@ class NewsPageTest extends TestCase
         );
     }
 
+    public function test_the_pagination_labels_are_translated_in_every_locale(): void
+    {
+        News::factory(15)->create();
+
+        foreach (config('app.available_locales') as $locale) {
+            app()->setLocale($locale);
+
+            $labels = collect($this->get(route('news'))->viewData('page')['props']['news']['links'])
+                ->pluck('label');
+
+            foreach ($labels as $label) {
+                $this->assertStringNotContainsString('pagination.', $label, "Onvertaalde paginering in locale {$locale}");
+            }
+        }
+    }
+
     public function test_the_public_page_hides_drafts_and_inactive_articles(): void
     {
         News::factory()->create(['title' => 'Zichtbaar bericht']);
@@ -39,6 +55,37 @@ class NewsPageTest extends TestCase
             fn (AssertableInertia $page) => $page
                 ->has('news.data', 1)
                 ->where('news.data.0.title', 'Zichtbaar bericht')
+        );
+    }
+
+    public function test_the_homepage_shows_at_most_five_published_articles(): void
+    {
+        News::factory(8)->create();
+        News::factory()->unpublished()->create(['title' => 'Concept']);
+        News::factory()->create(['status' => 0, 'title' => 'Inactief']);
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk()->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->component('Welcome')
+                ->has('news', 5)
+        );
+
+        $titles = collect($response->viewData('page')['props']['news'])->pluck('title');
+        $this->assertNotContains('Concept', $titles);
+        $this->assertNotContains('Inactief', $titles);
+    }
+
+    public function test_the_homepage_shows_the_newest_articles_first(): void
+    {
+        News::factory()->create(['title' => 'Oudste', 'created_at' => now()->subWeek()]);
+        News::factory()->create(['title' => 'Nieuwste', 'created_at' => now()]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertInertia(
+            fn (AssertableInertia $page) => $page->where('news.0.title', 'Nieuwste')
         );
     }
 
@@ -66,9 +113,6 @@ class NewsPageTest extends TestCase
         $this->actingAs($user)->get(route('news.index'))->assertForbidden();
     }
 
-    /**
-     * Een gebruiker die het nieuwsbeheer in het dashboard mag openen.
-     */
     private function newsEditor(): User
     {
         Permission::findOrCreate('access dashboard');

@@ -9,18 +9,10 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Location;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // === Customer Facing Routes
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => (Route::has('login') && ! auth()->check()),
-        'canRegister' => Route::has('register'),
-        'locations' => Location::where('status', 1)->limit(4)->get(),
-    ]);
-})->name('home');
+Route::get('/', [FrontEndController::class, 'index'])->name('home');
 Route::get('/about', [FrontEndController::class, 'about'])->name('about');
 Route::get('/contact', [FrontEndController::class, 'contact'])->name('contact');
 Route::post('/contact', [FrontEndController::class, 'store'])->name('contact.store');

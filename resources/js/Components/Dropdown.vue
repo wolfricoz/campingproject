@@ -49,7 +49,6 @@ const alignmentClasses = computed(() => {
     }
 });
 
-/** Boven de trigger uitklappen in plaats van eronder. */
 const positionClasses = computed(() => (props.dropUp ? 'bottom-full mb-2' : 'mt-2'));
 
 const open = ref(false);

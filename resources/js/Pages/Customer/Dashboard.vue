@@ -23,17 +23,12 @@ const statusColors = {
     'rejected': 'bg-rose-100 text-rose-700',
 };
 
-/**
- * Een reservering is te betalen zolang hij nog openstaat; een geannuleerde of afgewezen
- * reservering hoeft de klant uiteraard niet meer te betalen.
- */
 function isPayable(reservation) {
     return !reservation.payment_received
         && !['cancelled', 'rejected'].includes(reservation.booking_status);
 }
 
 function formatDate(date) {
-    // De datumnotatie volgt de gekozen taal mee.
     const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
 
     return new Date(date).toLocaleString(locale, {

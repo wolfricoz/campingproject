@@ -9,11 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
-/**
- * De reserveringsmodal wijzigt de status van een reservering via één endpoint. De waarde
- * hoort in `booking_status` terecht te komen; de kolom `status` is de actief-vlag waar het
- * overzicht op filtert en die mag er niet door overschreven worden.
- */
 class ArrangementStatusUpdateTest extends TestCase
 {
     use RefreshDatabase;
@@ -63,9 +58,6 @@ class ArrangementStatusUpdateTest extends TestCase
         $response->assertOk()->assertJsonPath('updated_data.booking_status', 'checked-in');
     }
 
-    /**
-     * Elke waarde uit de enum moet geaccepteerd worden, want de modal biedt ze allemaal aan.
-     */
     public function test_it_accepts_every_status_from_the_enum(): void
     {
         foreach (ArrangementStatus::cases() as $case) {

@@ -10,28 +10,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
-/**
- * Een locatie mag maar door één reservering tegelijk bezet worden. De boekingsformulieren
- * controleren dat vooraf via de availability endpoint, en de store methodes weigeren een
- * bezette locatie alsnog met een validatiefout.
- *
- * De datums zijn relatief aan vandaag, want de endpoint weigert het verleden.
- */
 class LocationAvailabilityTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Een datum over een aantal dagen, in het formaat dat de front-end verstuurt.
-     */
     private function inDays(int $days): string
     {
         return now()->addDays($days)->format('Y-m-d\TH:i');
     }
 
-    /**
-     * Een datum over een aantal dagen, in het formaat waarin de database hem bewaart.
-     */
     private function storedInDays(int $days): string
     {
         return now()->addDays($days)->format('Y-m-d H:i:s');
@@ -121,13 +108,11 @@ class LocationAvailabilityTest extends TestCase
         ]);
 
         $messages = [
-            // Bezette locatie
             $this->postJson(route('api.locations.available'), [
                 'location_id' => $location->id,
                 'start_date' => $this->inDays(10),
                 'end_date' => $this->inDays(14),
             ])->json('message'),
-            // Datum in het verleden
             $this->postJson(route('api.locations.available'), [
                 'location_id' => $location->id,
                 'start_date' => $this->inDays(-3),

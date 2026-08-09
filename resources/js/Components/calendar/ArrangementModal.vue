@@ -124,13 +124,9 @@ const selectedLocation = computed(() =>
     locations.value.find((l) => l.id === form.value.location_id) ?? null
 );
 
-// === Beschikbaarheid ===
-// Validatiefouten van de backend, per veld één melding.
 const errors = ref({});
 const availability = ref({checking: false, available: null, message: ''});
 
-// Alles wat niet expliciet beschikbaar is blokkeert het opslaan: de endpoint meldt zo
-// zowel een bezette locatie als een datum in het verleden.
 const isUnavailable = computed(() =>
     availability.value.available !== true && !!availability.value.message
 );
@@ -155,8 +151,6 @@ function checkAvailability() {
         availability.value = {
             checking: false,
             available: available,
-            // De melding komt van de backend, die weet waarom het niet kan. De vertaalsleutels
-            // zijn de Nederlandse teksten, dus we halen hem alsnog door __() heen.
             message: available ? '' : __(response.data.message ?? 'Deze locatie is in de gekozen periode al bezet.'),
         };
         if (available) {
@@ -168,7 +162,6 @@ function checkAvailability() {
     });
 }
 
-// De gebruiker typt datums, dus we wachten even voordat we de server bevragen.
 watch(() => [form.value.location_id, form.value.start_date, form.value.end_date], () => {
     availability.value = {checking: false, available: null, message: ''};
     clearTimeout(availabilityTimer);
@@ -182,7 +175,6 @@ function close() {
 async function save() {
     errors.value = {};
 
-    // Een bezette locatie mag niet worden opgeslagen; we blokkeren de aanvraag hier al.
     if (isUnavailable.value) {
         errors.value = {location_id: availability.value.message};
         return;
@@ -204,7 +196,6 @@ async function save() {
         emit('save', {...form.value});
 
     } catch (error) {
-        // 422 betekent dat de backend de reservering heeft afgekeurd (bijv. bezette locatie).
         if (error.response?.status === 422) {
             const responseErrors = error.response.data?.errors ?? {};
             errors.value = Object.fromEntries(
@@ -220,7 +211,6 @@ async function save() {
     }
 }
 function changeStatus(status){
-    // Zonder bestaande reservering valt er geen status te wijzigen.
     if (!props.arrangement) {
         return;
     }
@@ -291,14 +281,12 @@ const endTimePart = computed({
     }
 });
 
-// De einddatum mag nooit voor de startdatum liggen, dus we schuiven hem mee.
 watch(() => form.value.start_date, () => {
     if (form.value.end_date && form.value.end_date < form.value.start_date) {
         form.value.end_date = form.value.start_date;
     }
 });
 
-// === Nachten & prijs ===
 const days = ref(0);
 const price = ref(0);
 

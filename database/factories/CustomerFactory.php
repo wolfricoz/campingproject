@@ -13,9 +13,6 @@ class CustomerFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * De gasten zijn overwegend Nederlands, dus de adresgegevens komen uit de nl_NL
-     * faker in plaats van de Amerikaanse standaard.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array

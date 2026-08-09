@@ -16,14 +16,10 @@ class CustomerSeeder extends Seeder
             Customer::factory()->create($customer);
         }
 
-        // Wat extra gasten, zodat lijsten en zoekfuncties met meer dan een handvol rijen te zien zijn.
         Customer::factory(12)->create();
     }
 
     /**
-     * De vaste gasten die altijd in de database staan. Ze worden in de arrangementen
-     * gebruikt, zodat een demo steeds dezelfde herkenbare boekingen laat zien.
-     *
      * @return array<int, array{name: string, email: string, phone_number: string, street_name: string, street_number: string, postal_code: string, city: string, country: string}>
      */
     private function customers(): array

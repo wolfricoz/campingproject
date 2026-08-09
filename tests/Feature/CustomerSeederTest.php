@@ -48,10 +48,6 @@ class CustomerSeederTest extends TestCase
         $this->assertCount($emails->unique()->count(), $emails);
     }
 
-    /**
-     * De gasten zijn Nederlandstalig, dus de factory hoort geen Amerikaanse postcodes
-     * en woonplaatsen meer te genereren.
-     */
     public function test_the_factory_generates_a_dutch_postal_code(): void
     {
         $customer = Customer::factory()->create();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\GeneralMailMail;
 use App\Models\Location;
+use App\Models\News;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -17,7 +18,8 @@ class FrontEndController extends Controller
         return Inertia::render('Welcome', [
             'canLogin' => (Route::has('login') && ! auth()->check()),
             'canRegister' => Route::has('register'),
-            'locations' => Location::where('status', 1)->limit(4)->get(),
+            'locations' => Location::where('status', 1)->where('is_advertised', true)->limit(4)->get(),
+            'news' => News::query()->published()->latest()->limit(5)->get(),
         ]);
     }
 
@@ -40,10 +42,6 @@ class FrontEndController extends Controller
 
     }
 
-    /**
-     * Neemt het contactformulier aan. Validatie staat er al op; het versturen of
-     * opslaan van het bericht moet nog gebouwd worden.
-     */
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -52,7 +50,6 @@ class FrontEndController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        // We sturen een mail naar de receptie, met de content.
         Mail::to(config('mail.contact_email'))->send(new GeneralMailMail('Contact Aanvraag: '.$data['title'], $data['message']));
 
         return back();

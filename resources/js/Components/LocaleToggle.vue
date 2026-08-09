@@ -4,7 +4,6 @@ import {computed} from 'vue';
 
 const locales = ['nl', 'en'];
 
-// De backend deelt de actieve taal mee; zolang dat nog niet gebeurt tonen we nl als actief.
 const currentLocale = computed(() => usePage().props.locale ?? 'nl');
 </script>
 

@@ -14,8 +14,6 @@ class Arrangement extends Model
     protected $guarded = [];
 
     /**
-     * The auto-incrementing id stays the primary key; only `guid` gets a UUID.
-     *
      * @return list<string>
      */
     public function uniqueIds(): array

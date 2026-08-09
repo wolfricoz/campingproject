@@ -12,10 +12,6 @@ use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
-/**
- * De guid-kolommen worden door de database zelf gevuld. Postgres en SQLite doen dat
- * met een andere expressie, deze test controleert dat het op beide werkt.
- */
 class GuidColumnTest extends TestCase
 {
     use RefreshDatabase;

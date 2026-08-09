@@ -12,10 +12,6 @@ class BlookersController extends Controller
      */
     public function store(Request $request)
     {
-        // Voer de volgende onderdelen NIET uit:
-        // • IFRAME/IDE integratie met Blookers.com
-
-        // Hier zou de integratie met blookers komen.
         throw new Exception('Blooker Integratie not implemented yet (Not required)');
     }
 }

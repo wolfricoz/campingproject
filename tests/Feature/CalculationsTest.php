@@ -6,10 +6,6 @@ use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * De boekingspagina is publiek en haalt het aantal nachten en de prijs op bij deze endpoints,
- * dus ze moeten zonder ingelogde gebruiker bereikbaar zijn.
- */
 class CalculationsTest extends TestCase
 {
     use RefreshDatabase;

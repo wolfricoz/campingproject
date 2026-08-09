@@ -58,8 +58,6 @@ class BookingController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        // An occupied location may never be booked twice. This runs before the customer is
-        // created, otherwise a rejected booking would still leave a customer behind.
         if (! Location::isAvailable($arrangementData['location_id'], $arrangementData['start_date'], $arrangementData['end_date'])) {
             throw ValidationException::withMessages([
                 'location_id' => __('Deze locatie is in de gekozen periode al bezet.'),
@@ -98,7 +96,6 @@ class BookingController extends Controller
         return redirect()->route('payment', ['guid' => $arrangementResult['guid']]);
 
     }
-
 
     private function sendBookingMails(Arrangement $arrangement): void
     {

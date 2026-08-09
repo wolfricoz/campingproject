@@ -18,8 +18,6 @@ class Customer extends Model
     protected $guarded = [];
 
     /**
-     * The auto-incrementing id stays the primary key; only `guid` gets a UUID.
-     *
      * @return list<string>
      */
     public function uniqueIds(): array
@@ -48,7 +46,6 @@ class Customer extends Model
             if ($user = User::where('email', $data['email'])->first()) {
                 $data['user_id'] = $user->id;
             } else {
-                // Het wachtwoord is willekeurig; de klant stelt zelf een wachtwoord in via de link in de welkomstmail.
                 $user = User::create([
                     'name' => $data['name'],
                     'email' => $data['email'],

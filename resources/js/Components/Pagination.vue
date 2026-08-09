@@ -1,7 +1,6 @@
 <script setup>
 import {Link} from '@inertiajs/vue3';
 
-// De links komen rechtstreeks uit de Laravel paginator (news.links).
 defineProps({
     links: {type: Array, default: () => []},
 });

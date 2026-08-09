@@ -11,7 +11,6 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    // De paginator uit NewsController@index: {data: [...], links: [...]}
     news: {
         type: Object,
         default: () => ({data: [], links: []}),
@@ -21,7 +20,6 @@ defineProps({
 const page = usePage();
 const dateLocale = computed(() => (page.props.locale === 'en' ? 'en-GB' : 'nl-NL'));
 
-// Er is nog geen detailpagina, dus we klappen het bericht open in de kaart zelf.
 const openedId = ref(null);
 
 function toggle(article) {

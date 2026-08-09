@@ -27,14 +27,12 @@ class ArrangementsSeeder extends Seeder
         $this->addCancelledBookings($customers);
     }
 
-
     private function fillAgenda(Location $location, Collection $customers): void
     {
         $cursor = now()->startOfMonth()->subMonthNoOverflow()->startOfDay();
         $lastDay = now()->endOfMonth()->addMonthNoOverflow()->startOfDay();
 
         while ($cursor->lessThan($lastDay)) {
-            // Een gat van een paar dagen tussen twee verblijven; niet elke plaats is altijd bezet.
             $cursor = $cursor->addDays(fake()->numberBetween(1, 7));
 
             if ($cursor->greaterThanOrEqualTo($lastDay)) {
@@ -50,7 +48,6 @@ class ArrangementsSeeder extends Seeder
             $cursor = $end->copy()->startOfDay();
         }
     }
-
 
     private function addCancelledBookings(Collection $customers): void
     {
@@ -90,7 +87,6 @@ class ArrangementsSeeder extends Seeder
             'status' => 1,
         ]);
     }
-
 
     private function statusFor(Carbon $start, Carbon $end): ArrangementStatus
     {

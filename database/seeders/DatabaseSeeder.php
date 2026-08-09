@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Arrangement;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -31,8 +30,12 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('user'),
 
         ]);
-        Arrangement::factory(10)->create();
 
-        $this->call(NewsSeeder::class);
+        $this->call([
+            LocationsSeeder::class,
+            CustomerSeeder::class,
+            ArrangementsSeeder::class,
+            NewsSeeder::class,
+        ]);
     }
 }

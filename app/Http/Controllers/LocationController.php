@@ -50,10 +50,6 @@ class LocationController extends Controller
 
     }
 
-    /**
-     * Tells the front-end whether a location is still free for the given period, so the
-     * booking form can warn before it is submitted.
-     */
     public function checkAvailability(Request $request): JsonResponse
     {
         $arrangementData = $request->validate([

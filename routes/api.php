@@ -25,7 +25,6 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
 
         Route::post('/store', [LocationController::class, 'store'])->name('store');
 
-        // The public booking page needs to check availability too, so this one runs without auth.
         Route::post('/available', [LocationController::class, 'checkAvailability'])
             ->withoutMiddleware('auth:sanctum')
             ->name('available');
@@ -37,7 +36,6 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     });
 });
 
-// The public booking page needs these to show the amount of nights and the price, so they run without auth.
 Route::name('api.calculations.')->prefix('calculations')->withoutMiddleware('auth:sanctum')->group(function () {
     Route::get('/days', [ArrangementController::class, 'calculateDays'])->name('days');
     Route::get('/price', [ArrangementController::class, 'calculatePrice'])->name('price');

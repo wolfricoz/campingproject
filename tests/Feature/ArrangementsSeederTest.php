@@ -40,10 +40,6 @@ class ArrangementsSeederTest extends TestCase
         }
     }
 
-    /**
-     * De belangrijkste eis: geen enkele plaats staat twee keer tegelijk verhuurd, anders
-     * klopt de beschikbaarheidscontrole in het boekingsformulier niet met de demodata.
-     */
     public function test_no_location_is_double_booked(): void
     {
         $this->seed(ArrangementsSeeder::class);
@@ -67,10 +63,6 @@ class ArrangementsSeederTest extends TestCase
         }
     }
 
-    /**
-     * Een geannuleerde boeking blokkeert de plaats niet, dus de locatie hoort in die
-     * periode gewoon nog beschikbaar te zijn.
-     */
     public function test_cancelled_bookings_do_not_block_their_location(): void
     {
         $this->seed(ArrangementsSeeder::class);

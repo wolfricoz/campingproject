@@ -9,9 +9,6 @@ use Inertia\Testing\AssertableInertia;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
-/**
- * De kalender op het dashboard toont standaard deze maand, en met ?month=YYYY-MM een andere.
- */
 class DashboardCalendarTest extends TestCase
 {
     use RefreshDatabase;
@@ -53,10 +50,6 @@ class DashboardCalendarTest extends TestCase
         );
     }
 
-    /**
-     * Een verblijf dat vóór de maand begint en erna pas eindigt hoort de hele maand zichtbaar
-     * te zijn; met een whereBetween op alleen de begin- of einddatum zou hij wegvallen.
-     */
     public function test_an_arrangement_spanning_the_whole_month_is_included(): void
     {
         Arrangement::factory()->create([
@@ -97,9 +90,6 @@ class DashboardCalendarTest extends TestCase
         $response->assertSessionHasErrors('month');
     }
 
-    /**
-     * Een gebruiker die het planningsdashboard mag openen.
-     */
     private function planner(): User
     {
         Permission::findOrCreate('access dashboard');

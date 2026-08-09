@@ -33,9 +33,6 @@ class NewsFactory extends Factory
         ];
     }
 
-    /**
-     * A draft article that is not visible on the public news page.
-     */
     public function unpublished(): static
     {
         return $this->state(fn (array $attributes): array => [

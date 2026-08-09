@@ -19,10 +19,8 @@ class ArrangementFactory extends Factory
      */
     public function definition(): array
     {
-        // start_date must fall within the current month
         $startDate = $this->faker->dateTimeBetween(now()->startOfMonth(), now()->endOfMonth());
 
-        // Stay length is 1 to 10 days, end_date can spill into next month
         $endDate = (clone $startDate)->modify('+'.$this->faker->numberBetween(1, 10).' days');
 
         return [

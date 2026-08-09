@@ -9,77 +9,95 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    locations: {
-        type: Array,
-        default: () => [],
-    },
 });
+
+const values = [
+    {title: 'Rust en ruimte', body: 'Beschrijf hier wat de camping rustig en ruim maakt.'},
+    {title: 'Midden in de natuur', body: 'Beschrijf hier de omgeving en wat er te doen is.'},
+    {title: 'Persoonlijk contact', body: 'Beschrijf hier hoe jullie gasten ontvangen.'},
+];
 </script>
 
 <template>
-    <Head :title="__('Welkom')" />
-    <GuestLayout :canLogin="canLogin" :canRegister="canRegister"  >
-        <div class="relative h-96 w-full">
-            <img src="/images/header.jpg" :alt="__('Uitzicht over de camping')"
-                 class="absolute inset-0 w-full h-full object-cover object-center" />
-            <div class="relative z-10 flex justify-left h-full p-10">
-                <div
-                    class="flex flex-col justify-between w-64 rounded-xl bg-emerald-500/80 backdrop-blur-sm px-6 py-4 text-center shadow-lg ring-1 ring-white/20 transition hover:bg-emerald-600 hover:shadow-xl cursor-pointer">
-                    <div>
-                        <h3 class="text-lg font-semibold text-white">{{ __('Boek je vakantie!') }}</h3>
-                        <p class="mt-1 text-sm text-white/80">{{ __('Vind jouw perfecte plek') }}</p>
-                    </div>
-                    <Link class="general-button" :href="route('booking')">
-                        {{ __('Reserveer nu!') }}
-                    </Link>
-                </div>
+    <Head :title="__('Over Ons')"/>
+    <GuestLayout :canLogin="canLogin" :canRegister="canRegister">
 
+        <!-- === Kop === -->
+        <div class="relative h-72 w-full">
+            <img src="/images/header.jpg" :alt="__('Uitzicht over de camping')"
+                 class="absolute inset-0 h-full w-full object-cover object-center"/>
+            <div class="absolute inset-0 bg-black/30"></div>
+            <div class="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
+                <h1 class="text-3xl font-bold text-white sm:text-4xl">{{ __('Over Ons') }}</h1>
+                <p class="mt-2 max-w-2xl text-sm text-white/90">
+                    {{ __('Een korte introductiezin over de camping.') }}
+                </p>
             </div>
         </div>
 
-        <!-- === Uitgelichte locaties === -->
-        <div v-if="locations.length" class="bg-gray-50 px-4 py-12">
+        <!-- === Ons verhaal === -->
+        <div class="bg-white px-4 py-12">
+            <div class="mx-auto max-w-3xl">
+                <h2 class="text-2xl font-bold text-gray-800">{{ __('Ons verhaal') }}</h2>
+                <div class="mt-4 space-y-4 text-sm leading-relaxed text-gray-600">
+                    <!-- TODO Rico: hier komt het verhaal van de camping. -->
+                    <p>{{ __('Hier komt het verhaal van de camping: hoe het begon en wie erachter zit.') }}</p>
+                    <p>{{ __('Hier komt een tweede alinea, bijvoorbeeld over wat de camping bijzonder maakt.') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- === Waar we voor staan === -->
+        <div class="bg-gray-50 px-4 py-12">
             <div class="mx-auto max-w-6xl">
-                <h2 class="text-center text-2xl font-bold text-gray-800">{{ __('Uitgelichte locaties') }}</h2>
-                <p class="mt-1 text-center text-sm text-gray-500">{{ __('Een greep uit onze mooiste plekken.') }}</p>
+                <h2 class="text-center text-2xl font-bold text-gray-800">{{ __('Waar we voor staan') }}</h2>
 
-                <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    <div v-for="location in locations" :key="location.id"
-                         class="flex flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition hover:shadow-xl">
-                        <img v-if="location.photo" :src="location.photo" :alt="location.name"
-                             class="h-40 w-full object-cover object-center"/>
-                        <div v-else
-                             class="flex h-40 w-full items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-300">
-                            <span class="text-sm font-medium text-emerald-800/70">{{ __('Geen foto beschikbaar') }}</span>
-                        </div>
-
-                        <div class="flex flex-1 flex-col p-4">
-                            <h3 class="truncate text-base font-semibold text-gray-800">{{ location.name }}</h3>
-                            <p class="text-xs text-gray-500">{{ location.type ?? '—' }}</p>
-
-                            <p class="mt-2 line-clamp-3 text-sm text-gray-600">{{ location.description }}</p>
-
-                            <div class="mt-3 flex flex-wrap gap-1">
-                                <span v-if="location.has_electricity"
-                                      class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700">{{ __('Stroom') }}</span>
-                                <span v-if="location.has_water"
-                                      class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700">{{ __('Water') }}</span>
-                                <span v-if="location.has_shade"
-                                      class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700">{{ __('Schaduw') }}</span>
-                            </div>
-
-                            <div class="mt-4 flex items-center justify-between gap-2 border-t border-gray-100 pt-4">
-                                <span class="text-sm font-semibold text-gray-800">
-                                    {{ location.price_per_night ? '€ ' + location.price_per_night : '—' }}
-                                    <span class="text-xs font-normal text-gray-500">{{ __('/ nacht') }}</span>
-                                </span>
-                                <Link class="positive-button" :href="route('booking')">{{ __('Boeken') }}</Link>
-                            </div>
-                        </div>
+                <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                    <div v-for="value in values" :key="value.title"
+                         class="rounded-2xl bg-white p-6 shadow-lg transition hover:shadow-xl">
+                        <h3 class="text-base font-semibold text-gray-800">{{ __(value.title) }}</h3>
+                        <p class="mt-2 text-sm text-gray-600">{{ __(value.body) }}</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === Praktisch === -->
+        <div class="bg-white px-4 py-12">
+            <div class="mx-auto max-w-3xl">
+                <h2 class="text-2xl font-bold text-gray-800">{{ __('Praktische informatie') }}</h2>
+                <dl class="mt-4 grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+                    <!-- TODO Rico: de juiste gegevens invullen. -->
+                    <div class="flex justify-between border-b border-gray-100 py-2">
+                        <dt class="text-gray-500">{{ __('Adres') }}</dt>
+                        <dd class="text-gray-800">—</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 py-2">
+                        <dt class="text-gray-500">{{ __('Telefoonnummer') }}</dt>
+                        <dd class="text-gray-800">—</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 py-2">
+                        <dt class="text-gray-500">{{ __('E-mail') }}</dt>
+                        <dd class="text-gray-800">—</dd>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-100 py-2">
+                        <dt class="text-gray-500">{{ __('Receptie') }}</dt>
+                        <dd class="text-gray-800">—</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- === Doorverwijzing === -->
+        <div class="bg-emerald-50 px-4 py-12">
+            <div class="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+                <h2 class="text-2xl font-bold text-gray-800">{{ __('Zin gekregen?') }}</h2>
+                <p class="text-sm text-gray-600">{{ __('Bekijk onze locaties of reserveer direct je plek.') }}</p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <Link class="positive-button" :href="route('booking')">{{ __('Reserveer nu!') }}</Link>
+                    <Link class="general-button" :href="route('locations')">{{ __('Bekijk locaties') }}</Link>
                 </div>
             </div>
         </div>
     </GuestLayout>
-
 </template>

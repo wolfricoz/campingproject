@@ -102,21 +102,18 @@ const endTimePart = computed({
 
 const hasErrors = computed(() => Object.keys(form.errors).length > 0);
 
-// Klanten mogen niet in het verleden boeken, dus de datumvelden beginnen bij vandaag.
 const today = computed(() => {
     const now = new Date();
     const pad = (n) => String(n).padStart(2, '0');
     return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 });
 
-// De einddatum mag nooit voor de startdatum liggen, dus we schuiven hem mee.
 watch(() => form.start_date, () => {
     if (form.end_date && form.end_date < form.start_date) {
         form.end_date = form.start_date;
     }
 });
 
-// === Nachten & prijs ===
 const days = ref(0);
 const price = ref(0);
 
@@ -153,11 +150,8 @@ function fetchPrice() {
 watch(() => [form.start_date, form.end_date], fetchDays, {immediate: true});
 watch(() => [form.location_id, days.value], fetchPrice);
 
-// === Beschikbaarheid ===
 const availability = ref({checking: false, available: null, message: ''});
 
-// Alles wat niet expliciet beschikbaar is blokkeert de aanvraag: de endpoint meldt zo
-// zowel een bezette locatie als een datum in het verleden.
 const isUnavailable = computed(() =>
     availability.value.available !== true && !!availability.value.message
 );
@@ -181,8 +175,6 @@ function checkAvailability() {
         availability.value = {
             checking: false,
             available: available,
-            // De melding komt van de backend, die weet waarom het niet kan. De vertaalsleutels
-            // zijn de Nederlandse teksten, dus we halen hem alsnog door __() heen.
             message: available ? '' : __(response.data.message ?? 'Deze locatie is in de gekozen periode al bezet.'),
         };
         if (available) {
@@ -194,7 +186,6 @@ function checkAvailability() {
     });
 }
 
-// De gebruiker typt datums, dus we wachten even voordat we de server bevragen.
 watch(() => [form.location_id, form.start_date, form.end_date], () => {
     availability.value = {checking: false, available: null, message: ''};
     clearTimeout(availabilityTimer);
@@ -202,7 +193,6 @@ watch(() => [form.location_id, form.start_date, form.end_date], () => {
 }, {immediate: true});
 
 function submit() {
-    // Een bezette locatie mag niet worden opgeslagen; we blokkeren de aanvraag hier al.
     if (isUnavailable.value) {
         form.setError('location_id', availability.value.message);
         return;

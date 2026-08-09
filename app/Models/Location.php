@@ -17,8 +17,6 @@ class Location extends Model
     protected $guarded = [];
 
     /**
-     * The auto-incrementing id stays the primary key; only `guid` gets a UUID.
-     *
      * @return list<string>
      */
     public function uniqueIds(): array
@@ -26,11 +24,6 @@ class Location extends Model
         return ['guid'];
     }
 
-    /**
-     * Only the locations that have no overlapping arrangement in the given period.
-     * Cancelled and rejected arrangements do not occupy a location, and when an
-     * existing arrangement is being edited it should not block itself.
-     */
     #[Scope]
     public function available(Builder $query, $start, $end, ?int $ignoreArrangementId = null): Builder
     {
@@ -48,10 +41,6 @@ class Location extends Model
         });
     }
 
-    /**
-     * Whether the location is free for the whole period. Used by both the availability
-     * endpoint and the validation in the arrangement/booking store methods.
-     */
     public static function isAvailable(int $locationId, string $start, string $end, ?int $ignoreArrangementId = null): bool
     {
         return static::query()

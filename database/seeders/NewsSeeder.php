@@ -27,8 +27,6 @@ class NewsSeeder extends Seeder
     }
 
     /**
-     * The fixed articles that are always available for demos and screenshots.
-     *
      * @return array<int, array{title: string, summary: string, content: string, type: string}>
      */
     private function articles(): array

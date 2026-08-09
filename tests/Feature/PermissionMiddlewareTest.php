@@ -7,11 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
-/**
- * De routes gebruiken de 'permission:' en 'role:' aliassen van spatie/laravel-permission.
- * Sinds Laravel 11 registreert het framework die niet meer zelf, dus zonder alias in
- * bootstrap/app.php gooit elke route een "Target class [permission] does not exist".
- */
 class PermissionMiddlewareTest extends TestCase
 {
     use RefreshDatabase;

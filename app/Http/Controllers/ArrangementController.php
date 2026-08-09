@@ -64,8 +64,6 @@ class ArrangementController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        // An occupied location may never be booked twice; when editing, the arrangement
-        // itself must not count as an occupant.
         $ignoreArrangementId = $data['id'] === 0 ? null : $data['id'];
 
         if (! Location::isAvailable($data['location_id'], $data['start_date'], $data['end_date'], $ignoreArrangementId)) {
@@ -109,7 +107,6 @@ class ArrangementController extends Controller
             'status' => ['required', Rule::enum(ArrangementStatus::class)],
         ]);
 
-        // The enum belongs in `booking_status`; the `status` column is the active flag.
         $result = Arrangement::findOrFail($data['id']);
         $result->update(['booking_status' => $data['status']]);
 

@@ -41,9 +41,6 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * De vertalingen van de actieve taal. Voor de brontaal bestaat geen bestand;
-     * de front-end valt dan terug op de sleutel, en dat is de Nederlandse tekst.
-     *
      * @return array<string, string>
      */
     protected function translations(): array

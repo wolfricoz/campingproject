@@ -14,10 +14,6 @@ class ModelGuidTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * The guid used to be filled by the Postgres `gen_random_uuid()` default. Now that we run on
-     * SQLite, the models generate it themselves through HasUuids.
-     */
     public function test_models_generate_a_guid_on_create(): void
     {
         $user = User::create([

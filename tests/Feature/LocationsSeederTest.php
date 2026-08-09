@@ -34,10 +34,6 @@ class LocationsSeederTest extends TestCase
         }
     }
 
-    /**
-     * De faker-namen ("voluptatum ducimus dolores") zagen er in een demo niet uit; elke
-     * locatie hoort een naam te hebben die op de camping thuishoort.
-     */
     public function test_no_location_has_a_lorem_ipsum_name(): void
     {
         $this->seed(LocationsSeeder::class);
@@ -65,9 +61,6 @@ class LocationsSeederTest extends TestCase
         }
     }
 
-    /**
-     * Ook de losse factory mag geen lorem meer opleveren, want die vult de lijsten aan.
-     */
     public function test_the_factory_generates_a_recognisable_name(): void
     {
         $location = Location::factory()->create();

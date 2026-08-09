@@ -5,10 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * De taalkeuze wordt in de sessie bewaard, door SetLocale toegepast en via Inertia
- * als 'locale' en 'translations' gedeeld met de front-end.
- */
 class LocaleSwitchTest extends TestCase
 {
     use RefreshDatabase;

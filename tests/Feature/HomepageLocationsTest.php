@@ -7,10 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
-/**
- * De homepage toont alleen de plaatsen die als uitgelicht zijn aangevinkt, de
- * locatiepagina toont ze allemaal.
- */
 class HomepageLocationsTest extends TestCase
 {
     use RefreshDatabase;

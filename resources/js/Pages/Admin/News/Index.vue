@@ -6,7 +6,6 @@ import NewsModal from '@/Components/NewsModal.vue';
 import Pagination from '@/Components/Pagination.vue';
 
 const props = defineProps({
-    // De paginator uit NewsController@admin: {data: [...], links: [...]}
     news: {
         type: Object,
         default: () => ({data: [], links: []}),

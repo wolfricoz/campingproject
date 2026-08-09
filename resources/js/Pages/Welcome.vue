@@ -1,6 +1,7 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import GuestLayout from "@/Layouts/GuestLayout.vue";
+import { computed } from 'vue';
 
 defineProps({
     canLogin: {
@@ -13,7 +14,36 @@ defineProps({
         type: Array,
         default: () => [],
     },
+    news: {
+        type: Array,
+        default: () => [],
+    },
 });
+
+const page = usePage();
+const dateLocale = computed(() => (page.props.locale === 'en' ? 'en-GB' : 'nl-NL'));
+
+function formatDate(value) {
+    if (!value) {
+        return '';
+    }
+
+    return new Date(value).toLocaleDateString(dateLocale.value, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+}
+
+const typeStyles = {
+    Evenement: 'bg-blue-100 text-blue-800',
+    Onderhoud: 'bg-amber-100 text-amber-800',
+    Aanbieding: 'bg-emerald-100 text-emerald-800',
+};
+
+function typeClass(type) {
+    return typeStyles[type] ?? 'bg-gray-100 text-gray-700';
+}
 </script>
 
 <template>
@@ -77,6 +107,46 @@ defineProps({
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === Laatste nieuws === -->
+        <div v-if="news.length" class="bg-white px-4 py-12">
+            <div class="mx-auto max-w-6xl">
+                <h2 class="text-center text-2xl font-bold text-gray-800">{{ __('Laatste nieuws') }}</h2>
+                <p class="mt-1 text-center text-sm text-gray-500">
+                    {{ __('Het laatste nieuws en de aankomende activiteiten op de camping.') }}
+                </p>
+
+                <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <article v-for="article in news" :key="article.id"
+                             class="flex flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition hover:shadow-xl">
+                        <img v-if="article.image_url" :src="article.image_url" :alt="article.title"
+                             class="h-40 w-full object-cover object-center"/>
+                        <div v-else
+                             class="flex h-40 w-full items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-300">
+                            <span class="text-sm font-medium text-emerald-800/70">{{ __('Geen foto beschikbaar') }}</span>
+                        </div>
+
+                        <div class="flex flex-1 flex-col p-4">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="rounded-full px-2 py-0.5 text-[10px] font-medium" :class="typeClass(article.type)">
+                                    {{ __(article.type) }}
+                                </span>
+                                <time class="text-[11px] text-gray-500" :datetime="article.created_at">
+                                    {{ formatDate(article.created_at) }}
+                                </time>
+                            </div>
+
+                            <h3 class="mt-2 text-base font-semibold text-gray-800">{{ article.title }}</h3>
+                            <p v-if="article.summary" class="mt-2 line-clamp-3 text-sm text-gray-600">{{ article.summary }}</p>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="mt-8 flex justify-center">
+                    <Link class="positive-button" :href="route('news')">{{ __('Bekijk al het nieuws') }}</Link>
                 </div>
             </div>
         </div>

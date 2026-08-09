@@ -15,10 +15,6 @@ use Tests\TestCase;
 
 class MailRenderTest extends TestCase
 {
-    /**
-     * Bouwt een arrangement met klant en locatie in het geheugen, zodat de mails
-     * gerenderd kunnen worden zonder database.
-     */
     private function makeArrangement(array $attributes = []): Arrangement
     {
         $arrangement = Arrangement::factory()->make(array_merge([
