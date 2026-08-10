@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -28,6 +29,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'approve bookings',
             'reject bookings',
             'manage news',
+            'view customers',
+            'manage locations',
         ];
 
         foreach ($permissions as $permission) {
@@ -58,6 +61,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'check out bookings',
             'create booking',
             'manage news',
+            'view customers',
         ]);
 
         // Administrator — everything the receptionist can do, plus approve/reject
@@ -66,6 +70,21 @@ class RolesAndPermissionsSeeder extends Seeder
             ...$receptionist->permissions->pluck('name')->toArray(),
             'approve bookings',
             'reject bookings',
+            'manage locations',
         ]);
+
+        $this->giveExistingUsersTheCustomerRole($customer);
+    }
+
+    /**
+     * Everybody who signs up is a customer, but accounts that predate the roles
+     * would be left without one. Those are brought in line here, so the public
+     * routes keep working for them.
+     */
+    private function giveExistingUsersTheCustomerRole(Role $customer): void
+    {
+        User::doesntHave('roles')->each(function (User $user) use ($customer): void {
+            $user->assignRole($customer);
+        });
     }
 }

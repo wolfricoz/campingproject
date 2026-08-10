@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @method static Builder<static> published()
+ */
 class News extends Model
 {
     /** @use HasFactory<NewsFactory> */
@@ -32,7 +35,7 @@ class News extends Model
     }
 
     #[Scope]
-    public function published(Builder $query): Builder
+    protected function published(Builder $query): Builder
     {
         return $query->where('status', 1)->where('published', true);
     }

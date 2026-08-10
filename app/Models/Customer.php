@@ -37,16 +37,15 @@ class Customer extends Model
      *
      * @param  array<string, mixed>  $data
      */
-    public static function createNewCustomer(array $data): self|array
+    public static function createNewCustomer(array $data): self
     {
-        /** @var self $customer */
         $customer = self::find($data['id'] ?? 0);
 
         if (! $customer) {
             $customer = self::findByEmailAndPhoneNumber($data['email'], $data['phone_number']);
         }
 
-        if ($data['create_account'] && empty($customer?->user_id)) {
+        if ($data['create_account'] && ! $customer?->user_id) {
             if ($user = User::where('email', $data['email'])->first()) {
                 $data['user_id'] = $user->id;
             } else {
@@ -55,6 +54,7 @@ class Customer extends Model
                     'email' => $data['email'],
                     'password' => bcrypt(Str::random(21)),
                 ]);
+                $user->assignRole('customer');
                 $data['user_id'] = $user->id;
 
                 Mail::to($user->email)->send(new NewAccountMail($user, Password::createToken($user)));
@@ -63,13 +63,13 @@ class Customer extends Model
         unset($data['create_account']);
         if (! $customer) {
             unset($data['id']);
-            $result = self::create($data);
-        } else {
-            $data['id'] = $customer->id;
-            $customer->update($data);
-            $result = self::find($data['id']);
+
+            return self::create($data);
         }
 
-        return $result;
+        $data['id'] = $customer->id;
+        $customer->update($data);
+
+        return $customer->refresh();
     }
 }

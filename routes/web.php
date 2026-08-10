@@ -20,21 +20,30 @@ Route::get('/locations', [FrontEndController::class, 'locations'])->name('locati
 Route::get('/news', [NewsController::class, 'index'])->name('news');
 
 Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
-Route::get('/booking', [BookingController::class, 'index'])->name('booking');
-Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
-Route::get('/payment/{guid}', [PaymentController::class, 'index'])->name('payment');
-Route::post('/payment/complete', [PaymentController::class, 'store'])->name('payment.complete');
-Route::group(['middleware' => ['auth', 'permission:access dashboard'], 'prefix' => 'dashboard', 'as' => ''],
-    static function () {
-        Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-        Route::get('/arrangements/{status?}', [ArrangementController::class, 'index'])->middleware(['auth', 'verified', 'permission:view all bookings'])
+// The booking funnel is open to visitors without an account, so it leans on the
+// permissions of the customer role instead of on `auth`.
+Route::middleware('customer_permission:create booking')->group(function () {
+    Route::get('/booking', [BookingController::class, 'index'])->name('booking');
+    Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
+    Route::get('/payment/{guid}', [PaymentController::class, 'index'])->name('payment');
+    Route::post('/payment/complete', [PaymentController::class, 'store'])->name('payment.complete');
+});
+
+Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'dashboard', 'as' => ''],
+    static function () {
+        // Employees land on the planning, customers on their own reservations.
+        Route::get('/', [DashboardController::class, 'index'])
+            ->middleware('permission:access dashboard|view own bookings')
+            ->name('dashboard');
+
+        Route::get('/arrangements/{status?}', [ArrangementController::class, 'index'])->middleware(['permission:view all bookings'])
             ->name('arrangement.index');
 
-        Route::get('/location', [LocationController::class, 'adminIndex'])->middleware(['auth', 'verified', 'role:administrator'])
+        Route::get('/location', [LocationController::class, 'adminIndex'])->middleware(['permission:manage locations'])
             ->name('locations.index');
 
-        Route::get('/news', [NewsController::class, 'admin'])->middleware(['auth', 'verified', 'permission:manage news'])
+        Route::get('/news', [NewsController::class, 'admin'])->middleware(['permission:manage news'])
             ->name('news.index');
 
     });

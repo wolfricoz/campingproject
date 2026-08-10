@@ -89,7 +89,10 @@ class ArrangementController extends Controller
     }
 
     /**
-     * Changes the status of the reservation
+     * Changes the status of the reservation.
+     *
+     * Approving, rejecting, cancelling and checking in or out are separate
+     * permissions, so the requested status decides what the user needs.
      */
     public function update(Request $request): JsonResponse
     {
@@ -97,6 +100,12 @@ class ArrangementController extends Controller
             'id' => 'required|integer|exists:arrangements,id',
             'status' => ['required', Rule::enum(ArrangementStatus::class)],
         ]);
+
+        $status = ArrangementStatus::from($data['status']);
+
+        if (! auth()->user()->hasPermissionTo($status->permission())) {
+            abort(403, __('Je hebt geen toegang tot deze pagina.'));
+        }
 
         $result = Arrangement::findOrFail($data['id']);
         $result->update(['booking_status' => $data['status']]);

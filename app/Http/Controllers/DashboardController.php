@@ -13,17 +13,23 @@ use Inertia\Response;
 class DashboardController extends Controller
 {
     /**
-     * Returns the main page of the dashboard, including the data for the calendar
+     * Returns the main page of the dashboard, including the data for the calendar.
      *
-     * @return Response
+     * Customers do not get the planning but their own reservations.
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
-        if (! auth()->user()->hasPermissionTo('access dashboard')) {
-            $reservations = Arrangement::with('location')
-                ->where('customer_id', auth()->user()->customer->id)
-                ->orderByDesc('created_at')
-                ->get();
+        $user = auth()->user();
+
+        if (! $user->hasPermissionTo('access dashboard')) {
+            $customer = $user->customer;
+
+            $reservations = $customer
+                ? Arrangement::with('location')
+                    ->where('customer_id', $customer->id)
+                    ->orderByDesc('created_at')
+                    ->get()
+                : collect();
 
             return Inertia::render('Customer/Dashboard', [
                 'reservations' => $reservations,

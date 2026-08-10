@@ -8,9 +8,34 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+    /**
+     * The columns the booking screen needs. Everything else stays behind, so no
+     * more personal data leaves the server than the screen actually shows.
+     *
+     * @var list<string>
+     */
+    private const VISIBLE_COLUMNS = [
+        'id',
+        'name',
+        'email',
+        'phone_number',
+        'street_name',
+        'street_number',
+        'postal_code',
+        'city',
+        'country',
+        'user_id',
+    ];
+
+    /**
+     * Lists the customers for the booking screen. Guarded by `view customers`.
+     */
     public function index(): JsonResponse
     {
-        $customers = Customer::all();
+        $customers = Customer::query()
+            ->select(self::VISIBLE_COLUMNS)
+            ->orderBy('name')
+            ->get();
 
         return response()->json($customers);
     }

@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'password' => bcrypt('user'),
 
-        ]);
+        ])->assignRole('customer');
 
         $this->call([
             LocationsSeeder::class,

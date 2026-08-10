@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @method static Builder<static> available(string $start, string $end, ?int $ignoreArrangementId = null)
+ */
 class Location extends Model
 {
     use HasFactory, HasUuids;
@@ -25,7 +28,7 @@ class Location extends Model
     }
 
     #[Scope]
-    public function available(Builder $query, $start, $end, ?int $ignoreArrangementId = null): Builder
+    protected function available(Builder $query, string $start, string $end, ?int $ignoreArrangementId = null): Builder
     {
         return $query->whereDoesntHave('arrangements', function (Builder $query) use ($start, $end, $ignoreArrangementId) {
             $query->where('status', 1)

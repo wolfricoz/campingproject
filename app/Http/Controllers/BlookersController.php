@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use _PHPStan_48ec32058\Nette\Neon\Exception;
 use Illuminate\Http\Request;
+use RuntimeException;
 
 class BlookersController extends Controller
 {
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
-    public function store(Request $request)
+    public function store(Request $request): never
     {
-        throw new Exception('Blooker Integratie not implemented yet (Not required)');
+        throw new RuntimeException('Blooker Integratie not implemented yet (Not required)');
     }
 }
