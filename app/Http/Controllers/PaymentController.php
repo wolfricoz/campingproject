@@ -14,17 +14,15 @@ use Inertia\Response;
 class PaymentController extends Controller
 {
     /**
-     * @return RedirectResponse|Response
+     * Shows the payment page, unless the arrangement has already been paid for.
      */
-    public function index(Request $request, string $guid)
+    public function index(Request $request, string $guid): RedirectResponse|Response
     {
-        $arrangement = Arrangement::where('guid', $guid)->get()->first();
-        // Prevent the user from paying twice; while we'd love to get paid multiple times.. this would be a legal
-        // problem.
-        //        if ($arrangement->payment_received) {
+        $arrangement = Arrangement::where('guid', $guid)->firstOrFail();
 
-        //            return redirect()->route('dashboard');
-        //        }
+        if ($arrangement->payment_received) {
+            return $this->redirectAfterPayment(__('Deze boeking is al betaald.'));
+        }
 
         return Inertia::render('Payment', [
             'canLogin' => (Route::has('login') && ! auth()->check()),
@@ -34,28 +32,35 @@ class PaymentController extends Controller
         ]);
     }
 
+    /**
+     * Registers the payment for an arrangement and confirms it by mail.
+     */
     public function store(Request $request): RedirectResponse
     {
-        // This route is called when payment is confirmed
         $data = $request->validate([
             'guid' => 'required|string',
         ]);
 
-        // update arrangement to show payment was made
-        $arrangement = Arrangement::where('guid', $data['guid'])->first();
+        $arrangement = Arrangement::where('guid', $data['guid'])->firstOrFail();
+
+        if ($arrangement->payment_received) {
+            return $this->redirectAfterPayment(__('Deze boeking is al betaald.'));
+        }
 
         $arrangement->update(['payment_received' => true]);
 
-        // Send Email
         Mail::to($arrangement->customer->email)->send(new PaymentReceivedMail($arrangement));
 
-        // If the user is logged in, return to dashboard.
-        if (auth()->check()) {
-            return redirect()->route('dashboard')->with('success', 'Betaling successvol ontvangen!');
-        }
+        return $this->redirectAfterPayment();
+    }
 
-        // if its a guest, return to home.
-        return redirect()->route('home')->with('success', 'Betaling successvol ontvangen!');
+    /**
+     * Logged in customers continue in their dashboard, guests return to the homepage.
+     */
+    private function redirectAfterPayment(?string $message = null): RedirectResponse
+    {
+        $route = auth()->check() ? 'dashboard' : 'home';
 
+        return redirect()->route($route)->with('success', $message ?? __('Betaling successvol ontvangen!'));
     }
 }

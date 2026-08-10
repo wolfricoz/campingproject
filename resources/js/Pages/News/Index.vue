@@ -67,7 +67,7 @@ function typeClass(type) {
                 <div v-else class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <article v-for="article in news.data" :key="article.id"
                              class="flex flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition hover:shadow-xl">
-                        <img v-if="article.image" :src="article.image" :alt="article.title"
+                        <img v-if="article.image_url" :src="article.image_url" :alt="article.title"
                              class="h-40 w-full object-cover object-center"/>
                         <div v-else
                              class="flex h-40 w-full items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-300">

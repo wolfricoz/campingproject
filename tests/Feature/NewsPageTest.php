@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\News;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
@@ -24,6 +25,30 @@ class NewsPageTest extends TestCase
                 ->component('News/Index')
                 ->has('news.data', 3)
                 ->has('news.links')
+        );
+    }
+
+    public function test_the_public_news_page_exposes_the_image_url_of_an_article(): void
+    {
+        News::factory()->create(['image' => 'images/nieuws.webp']);
+
+        $response = $this->get(route('news'));
+
+        $response->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->where('news.data.0.image_url', Storage::disk('public')->url('images/nieuws.webp'))
+        );
+    }
+
+    public function test_the_public_news_page_keeps_the_default_header_image_as_is(): void
+    {
+        News::factory()->create(['image' => 'images/header.jpg']);
+
+        $response = $this->get(route('news'));
+
+        $response->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->where('news.data.0.image_url', 'images/header.jpg')
         );
     }
 

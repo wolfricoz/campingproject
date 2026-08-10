@@ -15,7 +15,7 @@ class CustomerController extends Controller
         return response()->json($customers);
     }
 
-    public function find(Request $request)
+    public function find(Request $request): JsonResponse
     {
         $data = $request->validate([
             'email' => 'required|string|email|max:255',
@@ -29,7 +29,6 @@ class CustomerController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        // validate the data
         $data = $request->validate([
             'customer' => 'required|array',
             'customer.id' => 'required|integer|max:100000',
@@ -44,10 +43,8 @@ class CustomerController extends Controller
             'customer.create_account' => 'required|boolean',
         ]);
         $data = $data['customer'];
-        // Clean up the data
         $data['email'] = strtolower($data['email']);
         $data['phone_number'] = str_replace(' ', '', $data['phone_number']);
-        $customer = Customer::find($data['id'] ?? 0);
 
         $result = Customer::createNewCustomer($data);
 

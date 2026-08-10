@@ -14,7 +14,6 @@ class Customer extends Model
 {
     use HasFactory, HasUuids;
 
-    //
     protected $guarded = [];
 
     /**
@@ -25,19 +24,24 @@ class Customer extends Model
         return ['guid'];
     }
 
-    public static function findByEmailAndPhoneNumber($email, $phone_number): ?self
+    public static function findByEmailAndPhoneNumber(string $email, ?string $phone_number): ?self
     {
-        //        dd($email, $phone_number);
         return (new self)->where('email', $email)->where('phone_number', $phone_number)->first();
-
     }
 
-    public static function createNewCustomer($data): self|array
+    /**
+     * Updates the matching customer, or creates a new one.
+     *
+     * When no customer is found on id we fall back to the e-mail and phone number
+     * combination, so the same person does not end up in the database twice.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public static function createNewCustomer(array $data): self|array
     {
         /** @var self $customer */
         $customer = self::find($data['id'] ?? 0);
-        // if no customer is found, we check on the e-mail and phone number; if they match we use that customer to
-        // prevent database polution.
+
         if (! $customer) {
             $customer = self::findByEmailAndPhoneNumber($data['email'], $data['phone_number']);
         }

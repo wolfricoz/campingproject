@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\ArrangementStatus;
 use App\Models\Arrangement;
 use App\Models\Location;
-use App\Services\daysCalculator;
+use App\Services\DaysCalculator;
 use App\Services\PriceCalculator;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,18 +19,13 @@ class ArrangementController extends Controller
 {
     /**
      * Gets a list of arrangements, if a status is provided it will only return those with that status.
-     *
-     * @return Response
      */
-    public function index(Request $request, ?string $status = null)
+    public function index(Request $request, ?string $status = null): Response
     {
-        // Set the dates for the beginning and end of the month
-        //        $start = Carbon::now()->startOfMonth();
-        //        $end = Carbon::now()->endOfMonth();
         if ($status && ArrangementStatus::tryFrom($status) === null) {
             abort(404, 'Status not found');
         }
-        // We fetch the arrangements for the current month.
+
         $arrangements = Arrangement::with('customer', 'location')
             ->where(function (Builder $query) use ($status) {
                 if (! $status) {
@@ -43,7 +37,6 @@ class ArrangementController extends Controller
             ->where('status', '=', 1)
             ->get();
 
-        // dd($arrangements);
         return Inertia::render('Admin/Arrangements/Index', [
             'arrangements' => $arrangements,
         ]);
@@ -55,7 +48,6 @@ class ArrangementController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // validate the data
         $data = $request->validate([
             'id' => 'required|integer',
             'customer_id' => 'required|integer',
@@ -72,7 +64,7 @@ class ArrangementController extends Controller
             ]);
         }
 
-        $days = (new daysCalculator)
+        $days = (new DaysCalculator)
             ->setStart(new \DateTime($data['start_date']))
             ->setEnd(new \DateTime($data['end_date']))
             ->calculate();
@@ -82,7 +74,6 @@ class ArrangementController extends Controller
             ->setLocation(Location::findOrFail($data['location_id']))
             ->calculate();
 
-        // Attempt to update the data, if the id is not found create a new record
         if ($data['id'] === 0) {
             unset($data['id']);
             $result = Arrangement::create($data);
@@ -123,7 +114,7 @@ class ArrangementController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
-        $days = (new daysCalculator)
+        $days = (new DaysCalculator)
             ->setStart(new \DateTime($data['start_date']))
             ->setEnd(new \DateTime($data['end_date']))
             ->calculate();
