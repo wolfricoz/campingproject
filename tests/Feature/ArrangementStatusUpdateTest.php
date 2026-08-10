@@ -7,15 +7,21 @@ use App\Models\Arrangement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class ArrangementStatusUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function administrator(): User
+    {
+        return User::factory()->create()->assignRole('administrator');
+    }
+
     private function updateStatus(Arrangement $arrangement, string $status): TestResponse
     {
-        return $this->actingAs(User::factory()->create())->postJson(route('api.arrangements.status'), [
+        return $this->actingAs($this->administrator())->postJson(route('api.arrangements.status'), [
             'id' => $arrangement->id,
             'status' => $status,
         ]);
@@ -81,7 +87,7 @@ class ArrangementStatusUpdateTest extends TestCase
 
     public function test_it_refuses_an_arrangement_that_does_not_exist(): void
     {
-        $response = $this->actingAs(User::factory()->create())->postJson(route('api.arrangements.status'), [
+        $response = $this->actingAs($this->administrator())->postJson(route('api.arrangements.status'), [
             'id' => 9999,
             'status' => 'confirmed',
         ]);
@@ -110,5 +116,55 @@ class ArrangementStatusUpdateTest extends TestCase
 
         $response->assertStatus(401);
         $this->assertSame('pending', $arrangement->fresh()->booking_status);
+    }
+
+    public function test_a_customer_may_not_change_a_status(): void
+    {
+        $arrangement = Arrangement::factory()->create(['booking_status' => 'pending']);
+
+        $response = $this->actingAs(User::factory()->create()->assignRole('customer'))
+            ->postJson(route('api.arrangements.status'), [
+                'id' => $arrangement->id,
+                'status' => 'confirmed',
+            ]);
+
+        $response->assertForbidden();
+        $this->assertSame('pending', $arrangement->fresh()->booking_status);
+    }
+
+    /**
+     * A receptionist may run the day to day statuses, but approving and
+     * rejecting a reservation is up to an administrator.
+     */
+    public function test_a_receptionist_may_check_in_but_may_not_approve_or_reject(): void
+    {
+        $receptionist = User::factory()->create()->assignRole('receptionist');
+
+        $allowed = Arrangement::factory()->create(['booking_status' => 'pending']);
+
+        $this->actingAs($receptionist)->postJson(route('api.arrangements.status'), [
+            'id' => $allowed->id,
+            'status' => ArrangementStatus::CHECKEDIN->value,
+        ])->assertOk();
+
+        foreach ([ArrangementStatus::CONFIRMED, ArrangementStatus::REJECTED] as $status) {
+            $refused = Arrangement::factory()->create(['booking_status' => 'pending']);
+
+            $this->actingAs($receptionist)->postJson(route('api.arrangements.status'), [
+                'id' => $refused->id,
+                'status' => $status->value,
+            ])->assertForbidden();
+
+            $this->assertSame('pending', $refused->fresh()->booking_status);
+        }
+    }
+
+    public function test_every_status_maps_onto_an_existing_permission(): void
+    {
+        $known = Permission::query()->pluck('name')->all();
+
+        foreach (ArrangementStatus::cases() as $case) {
+            $this->assertContains($case->permission(), $known, "Status {$case->value} points at an unknown permission.");
+        }
     }
 }

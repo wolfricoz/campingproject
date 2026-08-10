@@ -14,6 +14,14 @@ class LocationAvailabilityTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Booking on behalf of a customer is receptionist work.
+     */
+    private function receptionist(): User
+    {
+        return User::factory()->create()->assignRole('receptionist');
+    }
+
     private function inDays(int $days): string
     {
         return now()->addDays($days)->format('Y-m-d\TH:i');
@@ -194,7 +202,7 @@ class LocationAvailabilityTest extends TestCase
             'booking_status' => 'confirmed',
         ]);
 
-        $response = $this->actingAs(User::factory()->create())->postJson(route('api.arrangements.store'), [
+        $response = $this->actingAs($this->receptionist())->postJson(route('api.arrangements.store'), [
             'id' => 0,
             'customer_id' => $customer->id,
             'location_id' => $location->id,
@@ -211,7 +219,7 @@ class LocationAvailabilityTest extends TestCase
         $location = Location::factory()->create();
         $customer = Customer::factory()->create();
 
-        $response = $this->actingAs(User::factory()->create())->postJson(route('api.arrangements.store'), [
+        $response = $this->actingAs($this->receptionist())->postJson(route('api.arrangements.store'), [
             'id' => 0,
             'customer_id' => $customer->id,
             'location_id' => $location->id,
@@ -233,7 +241,7 @@ class LocationAvailabilityTest extends TestCase
             'booking_status' => 'confirmed',
         ]);
 
-        $response = $this->actingAs(User::factory()->create())->postJson(route('api.arrangements.store'), [
+        $response = $this->actingAs($this->receptionist())->postJson(route('api.arrangements.store'), [
             'id' => $arrangement->id,
             'customer_id' => $arrangement->customer_id,
             'location_id' => $location->id,
