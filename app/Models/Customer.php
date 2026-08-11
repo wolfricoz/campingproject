@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Mail\NewAccountMail;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +59,7 @@ class Customer extends Model
                 $data['user_id'] = $user->id;
 
                 Mail::to($user->email)->send(new NewAccountMail($user, Password::createToken($user)));
+                event(new Registered($user));
             }
         }
         unset($data['create_account']);

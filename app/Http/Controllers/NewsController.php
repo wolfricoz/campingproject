@@ -33,9 +33,6 @@ class NewsController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        if (! auth()->user()->hasPermissionTo('manage news')) {
-            abort(403);
-        }
         $data = $request->validate([
             'title' => 'required|max:100',
             'summary' => 'nullable|max:2048',

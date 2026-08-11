@@ -53,3 +53,25 @@ body{
 .itemrow:nth-child(2n + 1) {
     @apply bg-gray-300
 }
+
+/* Printen van één reservering: het printvel hangt onder <body> en is op het scherm
+   verborgen. Bij printen valt al het andere weg, zodat de balie een schone
+   bevestiging op papier krijgt in plaats van de hele dashboardpagina. */
+.print-sheet {
+    display: none;
+}
+
+@media print {
+    @page {
+        margin: 20mm;
+    }
+
+    body > *:not(.print-sheet) {
+        display: none !important;
+    }
+
+    .print-sheet {
+        display: block;
+        color: #000;
+    }
+}
