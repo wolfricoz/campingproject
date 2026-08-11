@@ -1,5 +1,6 @@
 <script setup>
-import {ref, computed, watch} from 'vue';
+import {ref, computed, watch, nextTick} from 'vue';
+import {usePage} from '@inertiajs/vue3';
 import {__} from '@/translate';
 
 const props = defineProps({
@@ -323,6 +324,40 @@ function fetchPrice() {
 watch(() => [form.value.start_date, form.value.end_date], fetchDays, {immediate: true});
 watch(() => [form.value.location_id, days.value], fetchPrice);
 
+// === Printen (balie) ===
+const printedAt = ref('');
+
+function formatDateTime(value) {
+    if (!value) {
+        return '—';
+    }
+    const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
+
+    return new Date(value).toLocaleString(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+
+const customerAddress = computed(() => {
+    const customer = form.value.customer;
+    const street = [customer.street_name, customer.street_number].filter(Boolean).join(' ');
+    const city = [customer.postal_code, customer.city].filter(Boolean).join(' ');
+
+    return [street, city, customer.country].filter(Boolean).join(', ') || '—';
+});
+
+
+async function printArrangement() {
+    printedAt.value = formatDateTime(new Date());
+    await nextTick();
+    window.print();
+}
+
 
 </script>
 
@@ -579,6 +614,12 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
                     </button>
                 </div>
                 <div class="flex items-center gap-2 mt-4 text-sm text-gray-700">
+                    <!-- Balie kan de reservering direct meegeven aan de gast. -->
+                    <button v-if="arrangement"
+                            class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            @click="printArrangement">
+                        {{ __('Reservering printen') }}
+                    </button>
                     <button
                         class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50" @click="close">
                         {{ __('Annuleren') }}
@@ -588,5 +629,62 @@ watch(() => [form.value.location_id, days.value], fetchPrice);
 
             </div>
         </div>
+
+        <Teleport to="body">
+            <div v-if="arrangement" class="print-sheet">
+                <div class="flex items-start justify-between border-b border-gray-400 pb-4">
+                    <img src="/images/logo.png" alt="Syntec Camping" class="h-16"/>
+                    <div class="text-right">
+                        <h1 class="text-xl font-bold">{{ __('Reserveringsbevestiging') }}</h1>
+                        <p class="text-sm">{{ __('Reserveringsnummer') }}: {{ form.id }}</p>
+                        <p class="text-sm">{{ __('Status') }}: {{ __(arrangement.booking_status) }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 py-6 text-sm">
+                    <div>
+                        <h2 class="mb-2 text-base font-semibold">{{ __('Klantgegevens') }}</h2>
+                        <p>{{ form.customer.name || '—' }}</p>
+                        <p>{{ customerAddress }}</p>
+                        <p>{{ form.customer.email || '—' }}</p>
+                        <p>{{ form.customer.phone_number || '—' }}</p>
+                    </div>
+                    <div>
+                        <h2 class="mb-2 text-base font-semibold">{{ __('Locatiegegevens') }}</h2>
+                        <p>{{ selectedLocation?.name ?? '—' }}</p>
+                        <p>{{ __('Type') }}: {{ selectedLocation?.type ?? '—' }}</p>
+                        <p>{{ __('Capaciteit') }}: {{ selectedLocation?.capacity ?? '—' }}</p>
+                        <p>{{ __('Slaapkamers') }}: {{ selectedLocation?.bedrooms ?? '—' }}</p>
+                    </div>
+                </div>
+
+                <table class="w-full border-collapse text-sm">
+                    <tbody>
+                        <tr>
+                            <th class="w-1/3 border border-gray-400 px-3 py-2 text-left">{{ __('Aankomst') }}</th>
+                            <td class="border border-gray-400 px-3 py-2">{{ formatDateTime(form.start_date) }}</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-gray-400 px-3 py-2 text-left">{{ __('Vertrek') }}</th>
+                            <td class="border border-gray-400 px-3 py-2">{{ formatDateTime(form.end_date) }}</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-gray-400 px-3 py-2 text-left">{{ __('Aantal nachten') }}</th>
+                            <td class="border border-gray-400 px-3 py-2">{{ __choice(':count nacht|:count nachten', days) }}</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-gray-400 px-3 py-2 text-left">{{ __('Totaalprijs') }}</th>
+                            <td class="border border-gray-400 px-3 py-2">€ {{ price }}</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-gray-400 px-3 py-2 text-left">{{ __('Betaling ontvangen') }}</th>
+                            <td class="border border-gray-400 px-3 py-2">{{ form.payment_received ? __('Ja') : __('Nee') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="mt-6 text-xs">{{ __('Geprint op :datum', {datum: printedAt}) }}</p>
+            </div>
+        </Teleport>
     </div>
 </template>
