@@ -98,7 +98,7 @@ return [
         ],
 
     ],
-    'contact_email' => env('MAIL_FROM_ADDRESS', 'test@test.nl'),
+    'contact_email' => env('MAIL_FROM_ADDRESS', 'admin@syntec-camping.nl'),
 
     /*
     |--------------------------------------------------------------------------

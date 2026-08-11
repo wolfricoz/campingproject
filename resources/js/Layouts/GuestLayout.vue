@@ -29,13 +29,15 @@ function handleImageError() {
 </script>
 
 <template>
+
+
     <div class="min-h-screen flex flex-col">
         <main class="flex-1 flex flex-col">
             <!--  === Navbar ===  -->
             <div class="flex items-center justify-center px-16 py-4 w-full bg-blue-600 shadow-sm border-b border-gray-200">
                 <div id="navbar" class="flex flex-row items-center gap-8 w-2/3">
                     <Link :href="route('home')" class="text-xl font-bold text-white tracking-tight">
-                        Syntec Camping
+                        <img src="/images/logo.png"  alt="Syntec Camping" class="h-16"/>
                     </Link>
                     <div class="flex flex-row gap-6 ml-auto">
                         <Link :href="route('home')" class="nav-button">
