@@ -50,7 +50,7 @@ class PaymentPageTest extends TestCase
 
         $this->assertTrue($arrangement->fresh()->payment_received);
 
-        Mail::assertSent(PaymentReceivedMail::class);
+        Mail::assertQueued(PaymentReceivedMail::class);
     }
 
     public function test_a_second_payment_is_refused_and_sends_no_extra_mail(): void

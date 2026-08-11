@@ -37,7 +37,7 @@ class NewAccountMailSentTest extends TestCase
 
         Customer::createNewCustomer($this->customerData());
 
-        Mail::assertSent(NewAccountMail::class, function (NewAccountMail $mail) {
+        Mail::assertQueued(NewAccountMail::class, function (NewAccountMail $mail) {
             return $mail->hasTo('jan@example.com')
                 && $mail->user->email === 'jan@example.com'
                 && $mail->token !== '';

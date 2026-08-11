@@ -54,7 +54,7 @@ class BookingMailSentTest extends TestCase
 
         $arrangement = Arrangement::firstOrFail();
 
-        Mail::assertSent(BookingConfirmMail::class, function (BookingConfirmMail $mail) use ($arrangement) {
+        Mail::assertQueued(BookingConfirmMail::class, function (BookingConfirmMail $mail) use ($arrangement) {
             return $mail->hasTo('jan@voorbeeld.nl')
                 && $mail->arrangement->id === $arrangement->id;
         });
@@ -71,7 +71,7 @@ class BookingMailSentTest extends TestCase
 
         $arrangement = Arrangement::firstOrFail();
 
-        Mail::assertSent(BookingNotificationMail::class, function (BookingNotificationMail $mail) use ($arrangement) {
+        Mail::assertQueued(BookingNotificationMail::class, function (BookingNotificationMail $mail) use ($arrangement) {
             return $mail->hasTo(config('mail.contact_email'))
                 && $mail->arrangement->id === $arrangement->id;
         });
