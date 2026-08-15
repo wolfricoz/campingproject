@@ -1,83 +1,34 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/DashboardLayout.vue';
-import {Head} from '@inertiajs/vue3';
-import ArrangementCard from "@/Components/calendar/ArrangementCard.vue";
-import {computed, ref} from "vue";
+import {Head, router} from '@inertiajs/vue3';
+import {computed, ref, watch} from "vue";
 import ArrangementModal from "@/Components/calendar/ArrangementModal.vue";
 import ArrangementListItem from "@/Components/calendar/ArrangementListItem.vue";
+import Pagination from "@/Components/Pagination.vue";
 
 const props = defineProps({
     arrangements: {
-        type: Array,
+        type: [Array, Object],
+        default: () => ({data: [], links: []}),
+    },
+    // The search and sorting the server used, so the toolbar keeps showing what you picked
+    filters: {
+        type: Object,
+        default: () => ({}),
+    },
+    status: {
+        type: String,
+        default: null,
     }
 });
 
 
 // === Functions  ===
-function getWeek(now) {
-    let d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    let dayNum = d.getDay() || 7;
-    d.setDate(d.getDate() + 4 - dayNum);
-    let yearStart = new Date(d.getFullYear(), 0, 1);
-    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7)
-}
-
-function getMonthFields() {
-    let now = new Date();
-    let firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    let lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    let monthArray = {};
-    for (let i = 0; i < lastDay.getDate(); i++) {
-        let day = new Date(now.getFullYear(), now.getMonth(), i + 1);
-        let week = getWeek(day)
-        let dayNumber = (day.getDay() || 7) - 1
-        if (monthArray[week] === undefined) {
-            monthArray[week] = [];
-        }
-        monthArray[week][dayNumber] = {
-            date: day,
-            week: week,
-            arrangements: []
-        }
-    }
-    return monthArray;
-}
-
-function populateArrangements() {
-    let days = getMonthFields();
-    let weeks = Object.keys(days)
-    // We go through all the arrangements and add the arrangements to the right days. o(nm)
-    for (let i = 0; i < props.arrangements.length; i++) {
-        const arrangement = props.arrangements[i]
-        arrangement.start_date = new Date(arrangement.start_date)
-        arrangement.end_date = new Date(arrangement.end_date)
-
-
-        for (let j = 0; j < weeks.length; j++) {
-            const week = weeks[j];
-            for (let k = 0; k < days[week].length; k++) {
-                const day = days[week][k];
-                if (!day) {
-                    continue;
-                }
-                const start = new Date(arrangement.start_date.getFullYear(), arrangement.start_date.getMonth(), arrangement.start_date.getDate());
-                const end = new Date(arrangement.end_date.getFullYear(), arrangement.end_date.getMonth(), arrangement.end_date.getDate());
-                if (day.date >= start && day.date <= end) {
-                    day.arrangements.push(arrangement);
-                    console.log('Adding new arrangement...');
-                }
-            }
-        }
-    }
-    return days;
-}
-
 function onSave(data) {
     // Find the arrangement
-    const arrangement = props.arrangements.find(a => a.id === data.id);
+    const arrangement = rows.value.find(a => a.id === data.id);
     if (!arrangement) {
-        props.arrangements.push(data);
+        rows.value.push(data);
         showCreateModal.value = false;
         return;
     }
@@ -107,7 +58,7 @@ function onSave(data) {
 }
 
 function onChangeStatus(data){
-    const arrangement = props.arrangements.find(a => a.id === data.id);
+    const arrangement = rows.value.find(a => a.id === data.id);
     if(!arrangement) {
         console.log("failed to update status on arrangement");
     }
@@ -115,13 +66,77 @@ function onChangeStatus(data){
 
 }
 
+// Searching, sorting and paging all happen on the server, so we just ask for a new page. The page
+// number is left out on purpose, a new search should start at the first page again
+function applyFilters(extra = {}) {
+    router.get(route('arrangement.index', selectedStatus.value || undefined), {
+        search: search.value || undefined,
+        sort: sort.value,
+        direction: direction.value,
+        ...extra,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+}
+
+function toggleDirection() {
+    direction.value = direction.value === 'asc' ? 'desc' : 'asc';
+    applyFilters();
+}
+
+function resetFilters() {
+    search.value = '';
+    sort.value = 'start_date';
+    direction.value = 'desc';
+    selectedStatus.value = '';
+    applyFilters();
+}
+
 // === Data ===
-const now = new Date();
-const weekNumber = getWeek(now);
-const monthName = new Date().toLocaleDateString('nl-NL', {month: 'long', year: 'numeric'});
-const days = computed(() => populateArrangements());
 const showCreateModal = ref(false);
 
+const search = ref(props.filters.search ?? '');
+const sort = ref(props.filters.sort ?? 'start_date');
+const direction = ref(props.filters.direction ?? 'desc');
+// The status sits in the url (/dashboard/arrangements/pending), so we can read it from the route
+const selectedStatus = ref(props.status ?? route().params.status ?? '');
+
+const statuses = ['pending', 'confirmed', 'checked-in', 'finished', 'cancelled', 'rejected'];
+
+const sortOptions = [
+    {value: 'start_date', label: 'Aankomst'},
+    {value: 'end_date', label: 'Vertrek'},
+    {value: 'customer', label: 'Klant'},
+    {value: 'location', label: 'Locatie'},
+    {value: 'total_price', label: 'Prijs'},
+    {value: 'created_at', label: 'Aangemaakt op'},
+];
+
+// The reservations come in as a paginator, but as long as the backend still sends a plain list we
+// read that as one page without links
+const rows = computed(() => Array.isArray(props.arrangements)
+    ? props.arrangements
+    : props.arrangements.data ?? []);
+
+const paginationLinks = computed(() => (Array.isArray(props.arrangements)
+    ? []
+    : props.arrangements.links ?? []));
+
+const total = computed(() => (Array.isArray(props.arrangements)
+    ? props.arrangements.length
+    : props.arrangements.total ?? rows.value.length));
+
+const hasFilters = computed(() => !!search.value || !!selectedStatus.value
+    || sort.value !== 'start_date' || direction.value !== 'desc');
+
+// We wait a moment while typing, otherwise every letter is a request
+let searchTimer = null;
+watch(search, () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(applyFilters, 300);
+});
 
 </script>
 
@@ -138,10 +153,62 @@ const showCreateModal = ref(false);
                 <div class="w-full">
                     <h1 class="text-2xl font-bold text-center">{{ __('Alle reserveringen') }}</h1>
                 </div>
+
+                <!-- Searching, filtering and sorting, the front desk uses this the whole day -->
+                <div class="flex flex-wrap items-end gap-3 px-6 pt-4">
+                    <div class="min-w-64 flex-1">
+                        <label class="label-base">{{ __('Zoeken') }}</label>
+                        <input type="search" v-model="search"
+                               :placeholder="__('Naam, e-mail of locatie')"
+                               class="w-full input-base"/>
+                    </div>
+
+                    <div>
+                        <label class="label-base">{{ __('Status') }}</label>
+                        <select v-model="selectedStatus" class="input-base" @change="applyFilters()">
+                            <option value="">{{ __('Alle statussen') }}</option>
+                            <option v-for="option in statuses" :key="option" :value="option">
+                                {{ __(option) }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="label-base">{{ __('Sorteren op') }}</label>
+                        <div class="flex gap-2">
+                            <select v-model="sort" class="input-base" @change="applyFilters()">
+                                <option v-for="option in sortOptions" :key="option.value" :value="option.value">
+                                    {{ __(option.label) }}
+                                </option>
+                            </select>
+                            <button type="button" class="general-button"
+                                    :title="direction === 'asc' ? __('Oplopend') : __('Aflopend')"
+                                    @click="toggleDirection">
+                                {{ direction === 'asc' ? '↑' : '↓' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <button v-if="hasFilters" type="button" class="negative-button" @click="resetFilters">
+                        {{ __('Wissen') }}
+                    </button>
+                </div>
+
                 <div class="gap-2 flex flex-col p-6">
-                    <ArrangementListItem v-for="arrangement in arrangements" :key="arrangement.id"  :arrangement="arrangement">
+                    <p class="text-xs text-gray-500">
+                        {{ __choice(':count reservering|:count reserveringen', total) }}
+                    </p>
+
+                    <p v-if="!rows.length" class="p-4 text-sm text-gray-500 text-center">
+                        {{ __('Geen reserveringen gevonden.') }}
+                    </p>
+
+                    <ArrangementListItem v-for="arrangement in rows" :key="arrangement.id" :arrangement="arrangement"
+                                         @save="onSave" @change-status="onChangeStatus">
 
                     </ArrangementListItem>
+
+                    <Pagination :links="paginationLinks" class="mt-4"/>
                 </div>
             </section>
 

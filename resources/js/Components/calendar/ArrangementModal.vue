@@ -214,6 +214,21 @@ async function save() {
 
     }
 }
+// Confirming the reservation and confirming that the money came in are two different things, so
+// the payment does not run through changeStatus
+function confirmPayment() {
+    axios.post(route('api.arrangements.payment'), {
+        id: form.value.id,
+    }).then(response => {
+        form.value.payment_received = true;
+        if (props.arrangement) {
+            props.arrangement.payment_received = true;
+        }
+    }).catch(error => {
+        console.log(error);
+    });
+}
+
 function changeStatus(status){
     if (!props.arrangement) {
         return;
@@ -615,7 +630,15 @@ async function printArrangement() {
                             @click="changeStatus('confirmed')"
                             v-show="props.arrangement"
                     >
-                        {{ __('Bevestig') }}
+                        {{ __('Bevestig reservering') }}
+                    </button>
+
+                    <!-- The money can come in at the desk, that says nothing about the status -->
+                    <button v-if="arrangement && !form.payment_received"
+                            class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+                            @click="confirmPayment"
+                    >
+                        {{ __('Bevestig betaling') }}
                     </button>
                     <button v-if="arrangement?.booking_status === 'pending' "
                             class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-emerald-700"

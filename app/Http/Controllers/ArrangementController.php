@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ArrangementStatus;
+use App\Mail\PaymentReceivedMail;
 use App\Models\Arrangement;
 use App\Models\Location;
 use App\Services\DaysCalculator;
@@ -10,6 +11,7 @@ use App\Services\PriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -19,6 +21,9 @@ class ArrangementController extends Controller
 {
     /**
      * Gets a list of arrangements, if a status is provided it will only return those with that status.
+     *
+     * The overview searches and sorts on the server and comes back per page, so the list stays
+     * workable once the camping has been running for a few months.
      */
     public function index(Request $request, ?string $status = null): Response
     {
@@ -26,19 +31,24 @@ class ArrangementController extends Controller
             abort(404, 'Status not found');
         }
 
-        $arrangements = Arrangement::with('customer', 'location')
-            ->where(function (Builder $query) use ($status) {
-                if (! $status) {
-                    return $query;
-                }
+        $filters = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'sort' => 'nullable|string',
+            'direction' => 'nullable|in:asc,desc',
+        ]);
 
+        $arrangements = Arrangement::with('customer', 'location')
+            ->when($status, function (Builder $query) use ($status) {
                 return $query->where('booking_status', $status);
             })
             ->where('status', '=', 1)
-            ->get();
+            ->filter($filters)
+            ->paginate(25)
+            ->withQueryString();
 
         return Inertia::render('Admin/Arrangements/Index', [
             'arrangements' => $arrangements,
+            'filters' => $filters,
         ]);
 
     }
@@ -112,6 +122,35 @@ class ArrangementController extends Controller
 
         return response()->json(['status' => 'success!', 'updated_data' => $result]);
 
+    }
+
+    /**
+     * Registers that the payment for a reservation came in.
+     *
+     * Confirming the reservation and confirming the payment are two different
+     * things, so the front desk has a separate button for each of them.
+     */
+    public function confirmPayment(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'id' => 'required|integer|exists:arrangements,id',
+        ]);
+
+        $arrangement = Arrangement::findOrFail($data['id']);
+
+        if ($arrangement->payment_received) {
+            return response()->json([
+                'status' => 'success!',
+                'message' => __('Deze boeking is al betaald.'),
+                'updated_data' => $arrangement,
+            ]);
+        }
+
+        $arrangement->update(['payment_received' => true]);
+
+        Mail::to($arrangement->customer->email)->send(new PaymentReceivedMail($arrangement));
+
+        return response()->json(['status' => 'success!', 'updated_data' => $arrangement]);
     }
 
     /**

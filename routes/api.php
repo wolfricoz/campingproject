@@ -39,6 +39,11 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
             ->middleware('permission:edit bookings')
             ->name('status');
 
+        // Confirming the reservation and confirming the payment are two different actions.
+        Route::post('/update/payment/', [ArrangementController::class, 'confirmPayment'])
+            ->middleware('permission:edit bookings')
+            ->name('payment');
+
     });
     Route::name('locations.')->prefix('locations')->group(function () {
 
