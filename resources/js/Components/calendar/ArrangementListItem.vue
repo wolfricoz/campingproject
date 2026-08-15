@@ -1,7 +1,7 @@
 <script setup>
 import {ref} from "vue";
-import {usePage} from '@inertiajs/vue3';
 import arrangementModal from "@/Components/calendar/arrangementModal.vue";
+import {formatDayPart} from "@/dayparts";
 
 
 const emit = defineEmits(['save', 'changeStatus']);
@@ -45,19 +45,6 @@ function onChangeStatus(data){
 
 let showModal = ref(false);
 
-function formatDate(date) {
-    const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
-
-    return new Date(date).toLocaleString(locale, {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-
-    })
-}
-
 </script>
 
 <template>
@@ -96,8 +83,8 @@ function formatDate(date) {
             <!-- Dates -->
             <div class="min-w-0 flex-1 pl-4">
                 <p class="text-[10px] uppercase tracking-wide text-gray-400">{{ __('Periode') }}</p>
-                <p class="truncate text-[11px] text-gray-600">{{ formatDate(arrangement.start_date) }}</p>
-                <p class="truncate text-[11px] text-gray-600">{{ formatDate(arrangement.end_date) }}</p>
+                <p class="truncate text-[11px] text-gray-600">{{ formatDayPart(arrangement.start_date) }}</p>
+                <p class="truncate text-[11px] text-gray-600">{{ formatDayPart(arrangement.end_date) }}</p>
             </div>
 
             <!-- Status / price / payment -->

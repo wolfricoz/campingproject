@@ -1,6 +1,7 @@
 <script setup>
-import {Head, Link, usePage} from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
 import GuestLayout from "@/Layouts/GuestLayout.vue";
+import {formatDayPart} from "@/dayparts";
 
 const props = defineProps({
     canLogin: {
@@ -27,18 +28,6 @@ function isPayable(reservation) {
     return !reservation.payment_received
         && !['cancelled', 'rejected'].includes(reservation.booking_status);
 }
-
-function formatDate(date) {
-    const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
-
-    return new Date(date).toLocaleString(locale, {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-}
 </script>
 
 <template>
@@ -56,7 +45,8 @@ function formatDate(date) {
                         <div class="min-w-0">
                             <h2 class="truncate text-sm font-semibold text-gray-800">{{ reservation.location?.name }}</h2>
                             <p class="text-xs text-gray-500">
-                                {{ formatDate(reservation.start_date) }} — {{ formatDate(reservation.end_date) }}
+                                {{ formatDayPart(reservation.start_date, {withTimes: true}) }} —
+                                {{ formatDayPart(reservation.end_date, {withTimes: true}) }}
                             </p>
                         </div>
                         <div class="flex shrink-0 items-center gap-3">

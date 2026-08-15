@@ -1,7 +1,7 @@
 <script setup>
 import {ref} from "vue";
-import {usePage} from '@inertiajs/vue3';
 import arrangementModal from "@/Components/calendar/arrangementModal.vue";
+import {formatDayPart} from "@/dayparts";
 
 
 const emit = defineEmits(['save', 'changeStatus']);
@@ -53,19 +53,6 @@ function onChangeStatus(data){
 
 let showModal = ref(false);
 
-function formatDate(date) {
-    const locale = usePage().props.locale === 'en' ? 'en-GB' : 'nl-NL';
-
-    return new Date(date).toLocaleString(locale, {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-
-    })
-}
-
 </script>
 
 <template>
@@ -85,7 +72,7 @@ function formatDate(date) {
         continuesLeft ? 'pl-2' : 'ml-1 rounded-l-lg border-l-4',
         continuesRight ? '' : 'mr-1 rounded-r-lg',
     ]"
-        :title="`${arrangement.location.name} — ${arrangement.customer.name}\n${formatDate(arrangement.start_date)} – ${formatDate(arrangement.end_date)}`"
+        :title="`${arrangement.location.name} — ${arrangement.customer.name}\n${formatDayPart(arrangement.start_date, {withTimes: true})} – ${formatDayPart(arrangement.end_date, {withTimes: true})}`"
         @click="showModal = true"
     >
         <template v-if="!continuesLeft">
@@ -93,8 +80,10 @@ function formatDate(date) {
                 {{ arrangement.location.name }}
             </h3>
             <p class="truncate text-xs text-gray-600">{{ arrangement.customer.name }}</p>
+            <!-- The calendar already shows the days, so we leave out the year here -->
             <div class="truncate text-[11px] text-gray-500">
-                <span>{{ formatDate(arrangement.start_date) }}</span> – <span>{{ formatDate(arrangement.end_date) }}</span>
+                <span>{{ formatDayPart(arrangement.start_date, {withYear: false}) }}</span> –
+                <span>{{ formatDayPart(arrangement.end_date, {withYear: false}) }}</span>
             </div>
         </template>
         <!-- Vervolg van vorige week: alleen de kleur, de gegevens staan al aan het begin. -->

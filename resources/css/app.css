@@ -19,7 +19,7 @@ body{
 /* Formulieropmaak. Bewust zonder breedte, zodat w-full, flex-1 of een kolomspan
    per veld in de markup bepaald blijft worden. */
 .input-base {
-    @apply rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500;
+    @apply rounded-lg border-gray-300 text-sm focus:border-emerald-500 focus:ring-emerald-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
 }
 
 .label-base {

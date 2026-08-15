@@ -132,6 +132,9 @@ const isUnavailable = computed(() =>
     availability.value.available !== true && !!availability.value.message
 );
 
+// Once the customer has checked out the reservation is done, so it can only be viewed and printed
+const isCheckedOut = computed(() => props.arrangement?.booking_status === 'finished');
+
 let availabilityTimer = null;
 
 function checkAvailability() {
@@ -375,6 +378,12 @@ async function printArrangement() {
             </div>
 
             <div class="px-6 py-4 space-y-6">
+                <!-- The reservation is locked after check-out, so we tell the user why nothing works -->
+                <div v-if="isCheckedOut"
+                     class="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
+                    {{ __('Deze klant is uitgecheckt, de reservering kan niet meer worden aangepast.') }}
+                </div>
+
                 <!-- Algemene foutmelding wanneer de backend de reservering afkeurt -->
                 <div v-if="Object.keys(errors).length"
                      class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -390,6 +399,7 @@ async function printArrangement() {
                         <label class="label-base">* {{ __('Klant') }}</label>
                         <select v-model="form.customer_id"
                                 class="w-full input-base"
+                                :disabled="isCheckedOut"
                                 required
                         >
                             <option :value="null">{{ __('— Selecteer klant —') }}</option>
@@ -403,6 +413,7 @@ async function printArrangement() {
                         <select v-model="form.location_id"
                                 class="w-full input-base"
                                 :class="{'border-red-500': isUnavailable}"
+                                :disabled="isCheckedOut"
                                 required
                         >
                             <option :value="null">{{ __('— Selecteer locatie —') }}</option>
@@ -425,10 +436,12 @@ async function printArrangement() {
                         <div class="flex gap-2">
                             <input type="date" v-model="startDatePart"
                                    class="flex-1 input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                             <input type="time" v-model="startTimePart" step="60"
                                    class="input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                         </div>
@@ -439,10 +452,12 @@ async function printArrangement() {
                         <div class="flex gap-2">
                             <input type="date" v-model="endDatePart" :min="startDatePart"
                                    class="flex-1 input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                             <input type="time" v-model="endTimePart" step="60"
                                    class="input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                         </div>
@@ -509,6 +524,7 @@ async function printArrangement() {
                             <label class="label-base">* {{ __('Naam') }}</label>
                             <input type="text" v-model="form.customer.name"
                                    class="w-full input-base"
+                                   :disabled="isCheckedOut"
                                    required
 
                             />
@@ -517,6 +533,7 @@ async function printArrangement() {
                             <label class="label-base">* {{ __('E-mail') }}</label>
                             <input type="email" v-model="form.customer.email"
                                    class="w-full input-base"
+                                   :disabled="isCheckedOut"
                                    required
 
                             />
@@ -525,6 +542,7 @@ async function printArrangement() {
                             <label class="label-base">* {{ __('Telefoonnummer') }}</label>
                             <input type="tel" v-model="form.customer.phone_number"
                                    class="w-full input-base"
+                                   :disabled="isCheckedOut"
                                    required
 
                             />
@@ -536,22 +554,27 @@ async function printArrangement() {
                         <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
                             <input type="text" v-model="form.customer.street_name" :placeholder="__('Straat')"
                                    class="col-span-2 sm:col-span-3 input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                             <input type="text" v-model="form.customer.street_number" :placeholder="__('Nr.')"
                                    class="sm:col-span-1 input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                             <input type="text" v-model="form.customer.postal_code" :placeholder="__('Postcode')"
                                    class="sm:col-span-2 input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                             <input type="text" v-model="form.customer.city" :placeholder="__('Plaats')"
                                    class="col-span-2 sm:col-span-3 input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                             <input type="text" v-model="form.customer.country" :placeholder="__('Land')"
                                    class="col-span-2 sm:col-span-3 input-base"
+                                   :disabled="isCheckedOut"
                                    required
                             />
                         </div>
@@ -559,7 +582,8 @@ async function printArrangement() {
 
                     <label class="flex items-center gap-2 mt-4 text-sm text-gray-700" v-if="!arrangement?.customer?.user_id">
                         <input type="checkbox" v-model="form.customer.create_account"
-                               class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                               class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+                               :disabled="isCheckedOut"
                         />
                         {{ __('Account aanmaken voor deze klant') }}
                     </label>
@@ -601,7 +625,7 @@ async function printArrangement() {
                         {{ __('Afwijzen') }}
                     </button>
                     <button class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            :disabled="isUnavailable || availability.checking"
+                            :disabled="isCheckedOut || isUnavailable || availability.checking"
                             @click="save">
                         {{ props.arrangement ? __('Bijwerken') : __('Opslaan') }}
                     </button>
