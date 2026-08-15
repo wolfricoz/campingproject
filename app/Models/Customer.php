@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -23,6 +24,11 @@ class Customer extends Model
     public function uniqueIds(): array
     {
         return ['guid'];
+    }
+
+    public function arrangements(): HasMany
+    {
+        return $this->hasMany(Arrangement::class);
     }
 
     public static function findByEmailAndPhoneNumber(string $email, ?string $phone_number): ?self
@@ -73,5 +79,27 @@ class Customer extends Model
         $customer->update($data);
 
         return $customer->refresh();
+    }
+    public function anonymize()
+    {
+        if ($this->user_id){
+            // since the user hold an email; it has to be deleted.
+            User::find($this->user_id)->delete();
+        }
+
+        $this->update(
+            [
+                'name' => 'Klant Geanonimiseerd',
+                'email' => $this->guid . '@syntec-camping.nl',
+                'phone_number' => '0612345678',
+                'street_name' => '**',
+                'street_number' => '**',
+                'city' => '**',
+                'zip' => '**',
+                'country' => '**',
+                'user_id' => null, // we unlink the customer from the user.
+
+            ],
+        );
     }
 }

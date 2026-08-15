@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.SCHEMA:main</OriginalElement>
+  <nodes>
+    <node x="-119.5" y="1632.0">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.arrangements</node>
+    <node x="389.5" y="285.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.jobs</node>
+    <node x="289.5" y="-47.0">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.news</node>
+    <node x="233.0" y="1086.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.permissions</node>
+    <node x="88.5" y="580.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.locations</node>
+    <node x="203.5" y="1748.0">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.model_has_permissions</node>
+    <node x="346.0" y="696.0">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.sessions</node>
+    <node x="96.5" y="1425.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.failed_jobs</node>
+    <node x="473.0" y="1086.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.roles</node>
+    <node x="123.5" y="327.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.password_reset_tokens</node>
+    <node x="348.0" y="1478.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.role_has_permissions</node>
+    <node x="9.5" y="-26.0">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.job_batches</node>
+    <node x="-114.0" y="992.0">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.customers</node>
+    <node x="490.5" y="1748.0">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.model_has_roles</node>
+    <node x="-120.0" y="-192.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.migrations</node>
+    <node x="-131.5" y="264.5">cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.users</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.model_has_roles" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.roles" relationship="REFERENCES">
+      <point x="0.0" y="-45.0" />
+      <point x="572.0" y="1453.0" />
+      <point x="552.0" y="1453.0" />
+      <point x="0.0" y="66.5" />
+    </edge>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.role_has_permissions" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.roles" relationship="REFERENCES">
+      <point x="52.0" y="-34.5" />
+      <point x="504.0" y="1453.0" />
+      <point x="552.0" y="1453.0" />
+      <point x="0.0" y="66.5" />
+    </edge>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.arrangements" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.customers" relationship="REFERENCES">
+      <point x="-65.75" y="-161.0" />
+      <point x="-53.75" y="1593.0" />
+      <point x="-28.0" y="1593.0" />
+      <point x="0.0" y="161.0" />
+    </edge>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.arrangements" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.locations" relationship="REFERENCES">
+      <point x="65.75" y="-161.0" />
+      <point x="77.75" y="1413.0" />
+      <point x="192.0" y="1413.0" />
+      <point x="0.0" y="192.5" />
+    </edge>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.customers" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.users" relationship="REFERENCES">
+      <point x="0.0" y="-161.0" />
+      <point x="0.0" y="108.5" />
+    </edge>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.role_has_permissions" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.permissions" relationship="REFERENCES">
+      <point x="-52.0" y="-34.5" />
+      <point x="400.0" y="1453.0" />
+      <point x="312.0" y="1453.0" />
+      <point x="0.0" y="66.5" />
+    </edge>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.sessions" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.users" relationship="REFERENCES">
+      <point x="0.0" y="-77.0" />
+      <point x="432.0" y="553.0" />
+      <point x="-28.0" y="553.0" />
+      <point x="0.0" y="108.5" />
+    </edge>
+    <edge source="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.model_has_permissions" target="cf9fef5d-0d9b-43fb-867a-8c207e5ad08a.TABLE:main.permissions" relationship="REFERENCES">
+      <point x="0.0" y="-45.0" />
+      <point x="0.0" y="66.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Compact" zoom="0.8573650928703276" showDependencies="false" x="177.78653771353373" y="1039.4670570302235" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Columns</Category>
+    <Category>Comments</Category>
+    <Category>Key columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+
