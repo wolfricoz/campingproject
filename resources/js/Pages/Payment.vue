@@ -24,6 +24,14 @@ const paymentMethods = [
     {value: 'bank_transfer', label: 'Bankoverschrijving'},
 ];
 
+// The account of the camping, the reservation number is what we match the payment on
+const bankDetails = [
+    {label: 'Ten name van', value: 'Syntec Camping B.V.'},
+    {label: 'IBAN', value: 'NL02 ABNA 0123 4567 89'},
+    {label: 'BIC', value: 'ABNANL2A'},
+    {label: 'Kenmerk', value: props.guid},
+];
+
 const form = useForm(
     'POST',
     route('payment.complete'),
@@ -71,6 +79,19 @@ function submit() {
                             </label>
                         </div>
                         <p v-if="form.errors.payment_method" class="error-base">{{ form.errors.payment_method }}</p>
+
+                        <div v-if="form.payment_method === 'bank_transfer'"
+                             class="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm">
+                            <p class="text-gray-600">
+                                {{ __('Maak het bedrag over met onderstaande gegevens, onder vermelding van het kenmerk.') }}
+                            </p>
+                            <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1">
+                                <template v-for="detail in bankDetails" :key="detail.label">
+                                    <dt class="text-gray-500">{{ __(detail.label) }}</dt>
+                                    <dd class="font-medium text-gray-800">{{ detail.value }}</dd>
+                                </template>
+                            </dl>
+                        </div>
 
                         <Link type="button" @click="submit"
                               class="mt-6 block w-full rounded-lg bg-emerald-600 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-emerald-700 sm:inline-block sm:w-auto">
