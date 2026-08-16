@@ -28,6 +28,7 @@ function onSave(data){
     arrangement.customer.name = data.customer?.name ?? '';
     arrangement.customer.email = data.customer?.email ?? '';
     arrangement.customer.phone_number = data.customer?.phone_number ?? '';
+    arrangement.customer.phone_number_formatted = data.customer?.phone_number_formatted ?? data.customer?.phone_number ?? '';
     arrangement.customer.street_name = data.customer?.street_name ?? '';
     arrangement.customer.street_number = data.customer?.street_number ?? '';
     arrangement.customer.postal_code = data.customer?.postal_code ?? '';
@@ -76,7 +77,7 @@ let showModal = ref(false);
                 <p class="truncate text-sm font-medium text-gray-700">{{ arrangement.customer?.name }}</p>
                 <p class="truncate text-[11px] text-gray-500">{{ arrangement.customer?.email }}</p>
                 <p class="truncate text-[11px] text-gray-500">
-                    {{ arrangement.customer?.phone_number }} · {{ arrangement.customer?.city }}
+                    {{ arrangement.customer?.phone_number_formatted }} · {{ arrangement.customer?.city }}
                 </p>
             </div>
 

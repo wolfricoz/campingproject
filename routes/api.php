@@ -25,9 +25,8 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     });
 
     Route::name('arrangements.')->prefix('arrangements')->group(function () {
-        Route::get('/', [ArrangementController::class, 'index'])
-            ->middleware('permission:view all bookings')
-            ->name('index');
+        // The overview itself lives on the web route `arrangement.index`; it renders an
+        // Inertia page, so a second address on the api prefix served no purpose.
         Route::post('/', [ArrangementController::class, 'store'])
             ->middleware('permission:create bookings for customers|edit bookings')
             ->name('store');

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentMethod;
 use App\Mail\PaymentReceivedMail;
 use App\Models\Arrangement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -39,15 +41,14 @@ class PaymentController extends Controller
     {
         $data = $request->validate([
             'guid' => 'required|string',
+            'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
         ]);
 
         $arrangement = Arrangement::where('guid', $data['guid'])->firstOrFail();
 
-        if ($arrangement->payment_received) {
+        if (! $arrangement->registerPayment(PaymentMethod::from($data['payment_method']))) {
             return $this->redirectAfterPayment(__('Deze boeking is al betaald.'));
         }
-
-        $arrangement->update(['payment_received' => true]);
 
         Mail::to($arrangement->customer->email)->send(new PaymentReceivedMail($arrangement));
 

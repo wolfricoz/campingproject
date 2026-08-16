@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,9 +31,30 @@ class Arrangement extends Model
         return [
             'start_date' => 'datetime',
             'end_date' => 'datetime',
+            'payment_method' => PaymentMethod::class,
             'payment_received' => 'boolean',
+            'payment_received_at' => 'datetime',
             'confirmation_email_sent' => 'boolean',
         ];
+    }
+
+    /**
+     * Registers the payment once. Returns false when it was already registered,
+     * so the caller knows not to send a second confirmation mail.
+     */
+    public function registerPayment(?PaymentMethod $method = null): bool
+    {
+        if ($this->payment_received) {
+            return false;
+        }
+
+        $this->update([
+            'payment_method' => $method ?? $this->payment_method,
+            'payment_received' => true,
+            'payment_received_at' => now(),
+        ]);
+
+        return true;
     }
 
     /**

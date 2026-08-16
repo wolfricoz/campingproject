@@ -24,6 +24,29 @@ class DashboardCalendarTest extends TestCase
         );
     }
 
+    /**
+     * The list under the calendar prints the phone number, and it prints the
+     * readable version of it. That version is built on the server, so it has to
+     * travel along with the arrangement.
+     */
+    public function test_the_calendar_carries_the_readable_phone_number(): void
+    {
+        $arrangement = Arrangement::factory()->create([
+            'start_date' => now()->startOfMonth()->addDays(3),
+            'end_date' => now()->startOfMonth()->addDays(6),
+            'booking_status' => 'confirmed',
+        ]);
+        $arrangement->customer->update(['phone_number' => '06-24815903']);
+
+        $this->actingAs($this->planner())->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->where('arrangements.0.customer.phone_number', '0624815903')
+                    ->where('arrangements.0.customer.phone_number_formatted', '06-24815903')
+            );
+    }
+
     public function test_the_month_parameter_selects_another_month(): void
     {
         $next = now()->addMonthNoOverflow();

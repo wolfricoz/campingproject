@@ -1,152 +1,152 @@
-  GET|HEAD  / ..................................................................................................................................................................................................................................................................................................................... home › FrontEndController@index
+
+  GET|HEAD  / ........................................................................ home › FrontEndController@index
             ⇂ web
-  GET|HEAD  about ................................................................................................................................................................................................................................................................................................................ about › FrontEndController@about
+  GET|HEAD  about ................................................................... about › FrontEndController@about
             ⇂ web
-  GET|HEAD  api/arrangements ................................................................................................................................................................................................................................................................................. api.arrangements.index › ArrangementController@index
-            ⇂ api
-            ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
-            ⇂ Spatie\Permission\Middleware\PermissionMiddleware:view all bookings
-  POST      api/arrangements ................................................................................................................................................................................................................................................................................. api.arrangements.store › ArrangementController@store
+  POST      api/arrangements .................................... api.arrangements.store › ArrangementController@store
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:create bookings for customers|edit bookings
-  GET|HEAD  api/arrangements/customers ............................................................................................................................................................................................................................................................................. api.customers.index › CustomerController@index
+  GET|HEAD  api/arrangements/customers ................................ api.customers.index › CustomerController@index
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:view customers
-  POST      api/arrangements/customers ............................................................................................................................................................................................................................................................................. api.customers.store › CustomerController@store
+  POST      api/arrangements/customers ................................ api.customers.store › CustomerController@store
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:create bookings for customers
-  GET|HEAD  api/arrangements/customers/{id} .......................................................................................................................................................................................................................................................................... api.customers.find › CustomerController@find
+  GET|HEAD  api/arrangements/customers/{id} ............................. api.customers.find › CustomerController@find
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:view customers
-  POST      api/arrangements/update/payment ....................................................................................................................................................................................................................................................... api.arrangements.payment › ArrangementController@confirmPayment
+  POST      api/arrangements/update/payment .......... api.arrangements.payment › ArrangementController@confirmPayment
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:edit bookings
-  POST      api/arrangements/update/status ................................................................................................................................................................................................................................................................. api.arrangements.status › ArrangementController@update
+  POST      api/arrangements/update/status .................... api.arrangements.status › ArrangementController@update
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:edit bookings
-  GET|HEAD  api/calculations/days ..................................................................................................................................................................................................................................................................... api.calculations.days › ArrangementController@calculateDays
+  GET|HEAD  api/calculations/days ........................ api.calculations.days › ArrangementController@calculateDays
             ⇂ api
             ⇂ App\Http\Middleware\CustomerPermissionMiddleware:create booking
-  GET|HEAD  api/calculations/price .................................................................................................................................................................................................................................................................. api.calculations.price › ArrangementController@calculatePrice
+  GET|HEAD  api/calculations/price ..................... api.calculations.price › ArrangementController@calculatePrice
             ⇂ api
             ⇂ App\Http\Middleware\CustomerPermissionMiddleware:create booking
-  GET|HEAD  api/locations ................................................................................................................................................................................................................................................................................................ api.locations › LocationController@index
+  GET|HEAD  api/locations ................................................... api.locations › LocationController@index
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:access dashboard
-  POST      api/locations/available ................................................................................................................................................................................................................................................................ api.locations.available › LocationController@checkAvailability
+  POST      api/locations/available ................... api.locations.available › LocationController@checkAvailability
             ⇂ api
             ⇂ App\Http\Middleware\CustomerPermissionMiddleware:create booking
-  POST      api/locations/store .................................................................................................................................................................................................................................................................................... api.locations.store › LocationController@store
+  POST      api/locations/store ....................................... api.locations.store › LocationController@store
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:manage locations
-  POST      api/news/store .................................................................................................................................................................................................................................................................................................. api.news.store › NewsController@store
+  POST      api/news/store ..................................................... api.news.store › NewsController@store
             ⇂ api
             ⇂ Illuminate\Auth\Middleware\Authenticate:sanctum
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:manage news
-  GET|HEAD  booking ............................................................................................................................................................................................................................................................................................................. booking › BookingController@index
+  GET|HEAD  booking ................................................................ booking › BookingController@index
             ⇂ web
             ⇂ App\Http\Middleware\CustomerPermissionMiddleware:create booking
-  POST      booking ....................................................................................................................................................................................................................................................................................................... booking.store › BookingController@store
+  POST      booking .......................................................... booking.store › BookingController@store
             ⇂ web
             ⇂ App\Http\Middleware\CustomerPermissionMiddleware:create booking
-  GET|HEAD  confirm-password ........................................................................................................................................................................................................................................................................... password.confirm › Auth\ConfirmablePasswordController@show
+  GET|HEAD  confirm-password .............................. password.confirm › Auth\ConfirmablePasswordController@show
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  POST      confirm-password ............................................................................................................................................................................................................................................................................................. Auth\ConfirmablePasswordController@store
+  POST      confirm-password ................................................ Auth\ConfirmablePasswordController@store
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  GET|HEAD  contact .......................................................................................................................................................................................................................................................................................................... contact › FrontEndController@contact
+  GET|HEAD  contact ............................................................. contact › FrontEndController@contact
             ⇂ web
-  POST      contact ...................................................................................................................................................................................................................................................................................................... contact.store › FrontEndController@store
+  POST      contact ......................................................... contact.store › FrontEndController@store
             ⇂ web
-  GET|HEAD  dashboard ....................................................................................................................................................................................................................................................................................................... dashboard › DashboardController@index
+  GET|HEAD  dashboard .......................................................... dashboard › DashboardController@index
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
             ⇂ Illuminate\Auth\Middleware\EnsureEmailIsVerified
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:access dashboard|view own bookings
-  GET|HEAD  dashboard/arrangements/{status?} ...................................................................................................................................................................................................................................................................... arrangement.index › ArrangementController@index
+  GET|HEAD  dashboard/arrangements/{status?} ......................... arrangement.index › ArrangementController@index
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
             ⇂ Illuminate\Auth\Middleware\EnsureEmailIsVerified
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:view all bookings
-  GET|HEAD  dashboard/location .................................................................................................................................................................................................................................................................................... locations.index › LocationController@adminIndex
+  GET|HEAD  dashboard/location ....................................... locations.index › LocationController@adminIndex
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
             ⇂ Illuminate\Auth\Middleware\EnsureEmailIsVerified
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:manage locations
-  GET|HEAD  dashboard/news ...................................................................................................................................................................................................................................................................................................... news.index › NewsController@admin
+  GET|HEAD  dashboard/news ......................................................... news.index › NewsController@admin
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
             ⇂ Illuminate\Auth\Middleware\EnsureEmailIsVerified
             ⇂ Spatie\Permission\Middleware\PermissionMiddleware:manage news
-  POST      email/verification-notification ................................................................................................................................................................................................................................................ verification.send › Auth\EmailVerificationNotificationController@store
+  POST      email/verification-notification ... verification.send › Auth\EmailVerificationNotificationController@store
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
             ⇂ Illuminate\Routing\Middleware\ThrottleRequests:6,1
-  GET|HEAD  forgot-password ............................................................................................................................................................................................................................................................................ password.request › Auth\PasswordResetLinkController@create
+  GET|HEAD  forgot-password ............................... password.request › Auth\PasswordResetLinkController@create
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  POST      forgot-password ............................................................................................................................................................................................................................................................................... password.email › Auth\PasswordResetLinkController@store
+  POST      forgot-password .................................. password.email › Auth\PasswordResetLinkController@store
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  POST      locale/{locale} ............................................................................................................................................................................................................................................................................................... locale.update › LocaleController@update
+  POST      locale/{locale} .................................................. locale.update › LocaleController@update
             ⇂ web
-  GET|HEAD  locations .................................................................................................................................................................................................................................................................................................... locations › FrontEndController@locations
+  GET|HEAD  locations ....................................................... locations › FrontEndController@locations
             ⇂ web
-  GET|HEAD  login .............................................................................................................................................................................................................................................................................................. login › Auth\AuthenticatedSessionController@create
-            ⇂ web
-            ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  POST      login ....................................................................................................................................................................................................................................................................................................... Auth\AuthenticatedSessionController@store
+  GET|HEAD  login ................................................. login › Auth\AuthenticatedSessionController@create
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  POST      logout ........................................................................................................................................................................................................................................................................................... logout › Auth\AuthenticatedSessionController@destroy
+  POST      login .......................................................... Auth\AuthenticatedSessionController@store
+            ⇂ web
+            ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
+  POST      logout .............................................. logout › Auth\AuthenticatedSessionController@destroy
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  GET|HEAD  news ...................................................................................................................................................................................................................................................................................................................... news › NewsController@index
+  GET|HEAD  news ......................................................................... news › NewsController@index
             ⇂ web
-  PUT       password ............................................................................................................................................................................................................................................................................................. password.update › Auth\PasswordController@update
+  PUT       password ................................................ password.update › Auth\PasswordController@update
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  POST      payment/complete ........................................................................................................................................................................................................................................................................................... payment.complete › PaymentController@store
+  POST      payment/complete .............................................. payment.complete › PaymentController@store
             ⇂ web
             ⇂ App\Http\Middleware\CustomerPermissionMiddleware:create booking
-  GET|HEAD  payment/{guid} ...................................................................................................................................................................................................................................................................................................... payment › PaymentController@index
+  GET|HEAD  payment/{guid} ......................................................... payment › PaymentController@index
             ⇂ web
             ⇂ App\Http\Middleware\CustomerPermissionMiddleware:create booking
-  GET|HEAD  profile ......................................................................................................................................................................................................................................................................................................... profile.edit › ProfileController@edit
+  GET|HEAD  profile ............................................................ profile.edit › ProfileController@edit
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  PATCH     profile ..................................................................................................................................................................................................................................................................................................... profile.update › ProfileController@update
+  PATCH     profile ........................................................ profile.update › ProfileController@update
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  DELETE    profile ................................................................................................................................................................................................................................................................................................... profile.destroy › ProfileController@destroy
+  DELETE    profile ...................................................... profile.destroy › ProfileController@destroy
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  GET|HEAD  register .............................................................................................................................................................................................................................................................................................. register › Auth\RegisteredUserController@create
+  GET|HEAD  register ................................................. register › Auth\RegisteredUserController@create
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  POST      register .......................................................................................................................................................................................................................................................................................................... Auth\RegisteredUserController@store
+  POST      register ............................................................. Auth\RegisteredUserController@store
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  POST      reset-password ...................................................................................................................................................................................................................................................................................... password.store › Auth\NewPasswordController@store
+  POST      reset-password ......................................... password.store › Auth\NewPasswordController@store
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  GET|HEAD  reset-password/{token} ............................................................................................................................................................................................................................................................................. password.reset › Auth\NewPasswordController@create
+  GET|HEAD  reset-password/{token} ................................ password.reset › Auth\NewPasswordController@create
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\RedirectIfAuthenticated
-  GET|HEAD  verify-email ............................................................................................................................................................................................................................................................................. verification.notice › Auth\EmailVerificationPromptController
+  GET|HEAD  verify-email ................................ verification.notice › Auth\EmailVerificationPromptController
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
-  GET|HEAD  verify-email/{id}/{hash} ............................................................................................................................................................................................................................................................................. verification.verify › Auth\VerifyEmailController
+  GET|HEAD  verify-email/{id}/{hash} ................................ verification.verify › Auth\VerifyEmailController
             ⇂ web
             ⇂ Illuminate\Auth\Middleware\Authenticate
             ⇂ Illuminate\Routing\Middleware\ValidateSignature
-            ⇂ Illuminate\Routing\Middleware\ThrottleRequests:6,1  ik heb 1 a
+            ⇂ Illuminate\Routing\Middleware\ThrottleRequests:6,1
+
+                                                                                                   Showing [45] routes
+

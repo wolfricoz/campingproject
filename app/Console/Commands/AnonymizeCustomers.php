@@ -3,11 +3,16 @@
 namespace App\Console\Commands;
 
 use App\Models\Customer;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 
 class AnonymizeCustomers extends Command
 {
+    /**
+     * The amount of years a customer's details are kept after their last stay.
+     */
+    private const RETENTION_YEARS = 7;
+
     /**
      * The name and signature of the console command.
      *
@@ -16,7 +21,7 @@ class AnonymizeCustomers extends Command
     protected $signature = 'customers:anonymize';
 
     /**
-     * The console command description.
+     * The description of the console command.
      *
      * @var string
      */
@@ -25,27 +30,28 @@ class AnonymizeCustomers extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Anonymizing customers...');
-        $count = 0;
 
-        $customers = Customer::join('arrangements', 'customers.id', '=', 'arrangements.customer_id')
-            ->where('customers.created_at', '<', now()->subDays(2556))
-            ->select('customers.*', 'arrangements.created_at as arrangement_created_at')
-            ->latest('arrangements.created_at')->get();
+        $cutoff = now()->subYears(self::RETENTION_YEARS);
+
+        // We ask for the customers themselves and not for a join on their bookings.
+        // A join returns one row per booking, and every row would then be judged on
+        // its own: a guest who booked eight years ago and came back last month would
+        // be anonymized on that first booking, which is exactly what we want to avoid.
+        $customers = Customer::query()
+            ->where('created_at', '<', $cutoff)
+            ->whereHas('arrangements')
+            ->whereDoesntHave('arrangements', function (Builder $query) use ($cutoff): void {
+                $query->where('created_at', '>=', $cutoff);
+            })
+            ->get();
 
         foreach ($customers as $customer) {
-
-            // check their last arrangement; this way we dont remove users who still use our services.
-            if (Carbon::parse($customer->arrangement_created_at)->lt(now()->subYears(7))) {
-
-                $customer->anonymize();
-                $count++;
-            }
+            $customer->anonymize();
         }
 
-        $this->info('Anonymized' . $count .  'customers!');
-
+        $this->info('Anonymized '.$customers->count().' customers!');
     }
 }

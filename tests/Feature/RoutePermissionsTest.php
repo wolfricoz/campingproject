@@ -180,15 +180,24 @@ class RoutePermissionsTest extends TestCase
     public function test_a_customer_may_not_read_the_arrangement_list(): void
     {
         $this->actingAs($this->userWithRole('customer'))
-            ->get(route('api.arrangements.index'))
+            ->get(route('arrangement.index'))
             ->assertForbidden();
     }
 
     public function test_a_receptionist_may_read_the_arrangement_list(): void
     {
         $this->actingAs($this->userWithRole('receptionist'))
-            ->get(route('api.arrangements.index'))
+            ->get(route('arrangement.index'))
             ->assertOk();
+    }
+
+    public function test_the_overview_is_no_longer_reachable_on_the_api_prefix(): void
+    {
+        // Only the post for storing a reservation is left on this address, so a get
+        // comes back as method not allowed instead of rendering the page a second time.
+        $this->actingAs($this->userWithRole('receptionist'))
+            ->get('/api/arrangements')
+            ->assertMethodNotAllowed();
     }
 
     // === Booking on behalf of a customer at the desk.

@@ -20,6 +20,14 @@ class Customer extends Model
     protected $guarded = [];
 
     /**
+     * The screens show the phone number in the notation people recognise, while
+     * the database keeps it in one machine notation.
+     *
+     * @var list<string>
+     */
+    protected $appends = ['phone_number_formatted'];
+
+    /**
      * @return list<string>
      */
     public function uniqueIds(): array
@@ -54,13 +62,40 @@ class Customer extends Model
      * Normalises the phone number on the way into the database, so the stored
      * notation can never depend on which screen it came from.
      *
-     * @return Attribute<never, ?string>
+     * @return Attribute<?string, ?string>
      */
     protected function phoneNumber(): Attribute
     {
         return Attribute::make(
             set: fn (?string $value): ?string => self::normalisePhoneNumber($value),
         );
+    }
+
+    /**
+     * The phone number as the desk reads it out loud.
+     *
+     * Only the two notations we can be certain about are dressed up: a Dutch
+     * mobile number and an international number. Anything else is shown the way
+     * it is stored, because guessing at an area code makes it harder to read
+     * instead of easier.
+     *
+     * @return Attribute<string, never>
+     */
+    protected function phoneNumberFormatted(): Attribute
+    {
+        return Attribute::get(function (): string {
+            $digits = (string) $this->phone_number;
+
+            if (str_starts_with($digits, '00')) {
+                return '+'.substr($digits, 2);
+            }
+
+            if (strlen($digits) === 10 && str_starts_with($digits, '06')) {
+                return '06-'.substr($digits, 2);
+            }
+
+            return $digits;
+        });
     }
 
     public static function findByEmailAndPhoneNumber(string $email, ?string $phone_number): ?self
@@ -116,11 +151,11 @@ class Customer extends Model
         return $customer->refresh();
     }
 
-    public function anonymize()
+    public function anonymize(): void
     {
         if ($this->user_id) {
             // since the user hold an email; it has to be deleted.
-            User::find($this->user_id)->delete();
+            User::find($this->user_id)?->delete();
         }
 
         $this->update(
@@ -131,7 +166,7 @@ class Customer extends Model
                 'street_name' => '**',
                 'street_number' => '**',
                 'city' => '**',
-                'zip' => '**',
+                'postal_code' => '**',
                 'country' => '**',
                 'user_id' => null, // we unlink the customer from the user.
 

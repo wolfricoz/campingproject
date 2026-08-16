@@ -172,11 +172,11 @@ De kolom *Dekking* verwijst naar de testklasse die de story bewijst. `—` betek
 | US-25 | Als beheerder wil ik nieuwsberichten kunnen plaatsen en als concept kunnen bewaren, zodat ik ze kan voorbereiden. | Het beheerscherm toont ook concepten; de publieke pagina niet; zonder recht is het scherm gesloten. | `NewsPageTest`, `RoutePermissionsTest` |
 | US-26 | Als beheerder wil ik dat elke pagina en elk endpoint afgeschermd is met het juiste recht, zodat gegevens niet uitlekken. | De middleware laat een gebruiker mét het recht door en blokkeert een gebruiker zonder; getest per route en per rol, inclusief gebruikers zonder rol en niet-ingelogde bezoekers. | `PermissionMiddlewareTest` (2), `RoutePermissionsTest` (27) |
 | US-27 | Als beheerder wil ik dat een accommodatie nooit dubbel geboekt kan worden, zodat er geen twee gezinnen voor dezelfde deur staan. | Overlappende reserveringen worden geweigerd op zowel het API-endpoint als de boekingspagina; een reservering blokkeert zichzelf niet bij het wijzigen. | `LocationAvailabilityTest`, `ArrangementsSeederTest` |
-| US-28 | Als beheerder wil ik dat klantgegevens automatisch worden geanonimiseerd zeven jaar na het laatste verblijf, zodat wij aan de AVG voldoen. | Klanten die zeven jaar niets meer geboekt hebben worden geanonimiseerd; klanten die nog wél boeken blijven ongemoeid; de opdracht draait automatisch volgens schema. | **Geen — zie BV-02 en BV-03** |
+| US-28 | Als beheerder wil ik dat klantgegevens automatisch worden geanonimiseerd zeven jaar na het laatste verblijf, zodat wij aan de AVG voldoen. | Klanten die zeven jaar niets meer geboekt hebben worden geanonimiseerd; klanten die nog wél boeken blijven ongemoeid; de opdracht draait automatisch volgens schema. | Bij de testronde van 13-08: **geen** (zie BV-02, BV-03 en BV-09). Sinds 16-08: `AnonymizeCustomersTest` (10) |
 | US-29 | Als beheerder wil ik dat de klant naar buiten toe met een GUID wordt aangeduid en niet met een oplopend nummer, zodat gegevens niet te raden zijn. | Elke tabel vult automatisch een geldige UUID; elk record krijgt een eigen GUID; de primaire sleutel blijft intern een oplopend getal. | `GuidColumnTest` (5), `ModelGuidTest` (2) |
 | US-30 | Als beheerder wil ik een demo-omgeving met realistische gegevens, zodat ik het systeem kan tonen en er zonder risico in kan oefenen. | Seeden vult elke tabel; minimaal vijf locaties met complete gegevens; geen "lorem ipsum"; unieke e-mailadressen; geen dubbel geboekte locatie; verleden boekingen staan op afgerond. | `DatabaseSeederTest`, `LocationsSeederTest` (5), `CustomerSeederTest` (4), `ArrangementsSeederTest` (5), `NewsSeederTest` (3) |
 
-**Totaal: 30 user stories, waarvan 29 geautomatiseerd afgedekt en 1 (US-28) niet.**
+**Totaal: 30 user stories, waarvan er bij de testronde van 13 augustus 29 geautomatiseerd waren afgedekt en 1 (US-28) niet. Sinds het herstel van 16 augustus zijn alle 30 afgedekt; zie 6.6.**
 
 ---
 
@@ -307,7 +307,7 @@ Deze 68,5 manuren komen boven op de uren die in het realisatiedocument van opdra
 |---|---|
 | Testklassen | 27 |
 | Uitgevoerde tests | **173** |
-| Assertions | **1.406** |
+| Assertions | **circa 1.400** |
 | Geslaagd | 173 |
 | Gefaald | 0 |
 | Overgeslagen | 0 |
@@ -361,13 +361,14 @@ Deze 68,5 manuren komen boven op de uren die in het realisatiedocument van opdra
 | ID | Bevinding | User story | Prioriteit | Status |
 |---|---|---|---|---|
 | BV-01 | Klant is niet op te zoeken aan de balie door tegenstrijdige telefoonnummervalidatie | US-20 | **Hoog** | **Hersteld** (ticket 45, hertest 16-08-2026) |
-| BV-02 | `customers:anonymize` anonimiseert klanten die nog wél actief zijn | US-28 | **Hoog** | Open |
-| BV-03 | De AVG-functionaliteit heeft geen enkele geautomatiseerde test | US-28 | Midden | Open |
-| BV-04 | PHPStan-melding: niet-bestaande eigenschap in `AnonymizeCustomers` | US-28 | Midden | Open |
-| BV-05 | Twee bestanden voldoen niet aan de codeconventies | — | Laag | Deels hersteld: `Customer.php` is meegelopen met het herstel van BV-01 |
+| BV-02 | `customers:anonymize` anonimiseert klanten die nog wél actief zijn | US-28 | **Hoog** | **Hersteld** (ticket 43, hertest 16-08-2026) |
+| BV-03 | De AVG-functionaliteit heeft geen enkele geautomatiseerde test | US-28 | Midden | **Hersteld** (ticket 44, hertest 16-08-2026) |
+| BV-04 | PHPStan-melding: niet-bestaande eigenschap in `AnonymizeCustomers` | US-28 | Midden | **Hersteld** (ticket 46, hertest 16-08-2026) |
+| BV-05 | Twee bestanden voldoen niet aan de codeconventies | — | Laag | **Hersteld** (ticket 47, hertest 16-08-2026) |
 | BV-06 | Regressie door omzetten van e-mail naar de wachtrij | US-09, US-12, US-17 | Hoog | **Gesloten** |
 | BV-07 | Lege voorbeeldtests uit de standaardinstallatie staan nog in de suite | — | Laag | Open |
 | BV-08 | Restrisico: het wachtrij-pad wordt door geen enkele test end-to-end bewezen | US-09 | Laag | Bewust niet ingepland |
+| BV-09 | `anonymize()` schrijft naar een kolom die niet bestaat: de opdracht loopt vast en de postcode blijft staan | US-28 | **Hoog** | Gevonden én hersteld op 16-08-2026 tijdens ticket 43 |
 
 ---
 
@@ -417,6 +418,10 @@ Daarnaast telt de teller `$count` het aantal rijen en niet het aantal klanten, w
 
 **Voorstel voor verbetering.** Per klant de **meest recente** reservering bepalen in plaats van over alle reserveringen te lopen, bijvoorbeeld met een `whereDoesntHave` op reserveringen van de afgelopen zeven jaar, of met een gegroepeerde subquery op `MAX(arrangements.created_at)`. Tegelijk de magische waarde `2556` vervangen door `now()->subYears(7)`, zodat de twee voorwaarden in de opdracht dezelfde grens gebruiken.
 
+**Herstel (ticket 43, uitgevoerd op 16 augustus 2026 door DV).** De `join` is vervangen door een vraag naar de klanten zelf: klanten die langer dan zeven jaar geleden zijn aangemeld, die minstens één reservering hebben, en die géén reservering hebben van ná de peilgrens. Daarmee levert de query één rij per klant en wordt niet langer per reservering geoordeeld. De grens staat nu op één plek als constante `RETENTION_YEARS = 7`, zodat de twee voorwaarden niet meer uit elkaar kunnen lopen, en de teller telt klanten in plaats van rijen. `Carbon::parse()` is niet meer nodig, waarmee ook BV-04 verdwijnt.
+
+**Bewijs.** Nieuwe testklasse `AnonymizeCustomersTest` met tien tests. De test die deze bevinding vasthoudt is `test_a_customer_who_still_books_is_left_alone`: een klant met een reservering van acht jaar geleden én één van vorige maand moet ongemoeid blijven. Verder wordt getest wie wél aan de beurt is, dat een klant zónder reserveringen buiten schot blijft, dat een verblijf van precies zeven jaar geleden de klant nog behoudt, dat de teller klanten telt en niet reserveringen, en dat de opdracht dagelijks ingepland staat. De klok wordt in deze tests stilgezet, anders is de grens van zeven jaar niet exact te testen.
+
 ---
 
 #### BV-03 — Geen geautomatiseerde test op de AVG-functionaliteit *(Midden)*
@@ -429,6 +434,10 @@ Daarnaast telt de teller `$count` het aantal rijen en niet het aantal klanten, w
 
 **Voorstel voor verbetering.** Een testklasse `AnonymizeCustomersTest` met minimaal vier gevallen: een klant zonder enige reservering, een klant met alleen oude reserveringen (moet geanonimiseerd worden), een klant met een oude én een recente reservering (moet ongemoeid blijven — dit is de test die BV-02 aantoont) en een klant die precies op de grens van zeven jaar zit. Aanvullend een test die controleert dat de opdracht in de planning staat.
 
+**Herstel (ticket 44, uitgevoerd op 16 augustus 2026 door RS).** `AnonymizeCustomersTest` telt tien tests en dekt alle voorgestelde gevallen, aangevuld met het wissen van elk herleidbaar veld, het verwijderen van het gekoppelde account en de tekst die de opdracht rapporteert. US-28 is daarmee niet langer de enige ongedekte user story: alle dertig zijn nu geautomatiseerd afgedekt.
+
+**Wat de dekking direct opleverde.** Het schrijven van deze tests bracht BV-09 aan het licht, een fout die vier weken in de code stond en waardoor de opdracht nooit gedraaid kán hebben. Dat is de zichtbaarste bevestiging van de conclusie in 6.5, punt 4.
+
 ---
 
 #### BV-04 — PHPStan-melding op `AnonymizeCustomers` *(Midden)*
@@ -438,6 +447,8 @@ Daarnaast telt de teller `$count` het aantal rijen en niet het aantal klanten, w
 **Omschrijving.** PHPStan meldt op level 5: *toegang tot de niet-bestaande eigenschap `App\Models\Customer::$arrangement_created_at`*. Bij het draaien bestaat die eigenschap wél, omdat de query hem als alias meegeeft (`arrangements.created_at as arrangement_created_at`). Het is dus geen storing bij het draaien, maar wel een reëel risico: zodra iemand de `select` aanpast, levert de eigenschap stilzwijgend `null` op. `Carbon::parse(null)` geeft dan de huidige tijd terug, waardoor de opdracht zonder foutmelding niemand meer anonimiseert — en dat merkt niemand, want er is geen test (BV-03).
 
 **Voorstel voor verbetering.** De eigenschap in het model documenteren met een `@property-read`-annotatie, of — beter, en tegelijk de oplossing voor BV-02 — de join vervangen door een subquery met `addSelect`, zodat het type wel af te leiden is.
+
+**Herstel (ticket 46, uitgevoerd op 16 augustus 2026 door DV).** Zoals verwacht is deze melding vanzelf verdwenen met het herstel van BV-02: zonder join is er ook geen alias meer. De twee gereserveerde uren zijn niet nodig geweest. PHPStan level 5 geeft sinds 16 augustus **nul meldingen** over de hele codebase.
 
 ---
 
@@ -449,7 +460,27 @@ Daarnaast telt de teller `$count` het aantal rijen en niet het aantal klanten, w
 
 **Voorstel voor verbetering.** `vendor/bin/pint` draaien en het resultaat controleren. Om herhaling te voorkomen wordt de controle opgenomen in het testprotocol (4.3) als voorwaarde voor het pushen naar `master`.
 
-**Stand na de hertest van 16 augustus.** `Customer.php` is meegelopen met het herstel van BV-01: het protocol schrijft voor dat Pint over de gewijzigde bestanden gaat vóór het pushen, en daarmee zijn de vijf afwijkingen in dat bestand verdwenen. `AnonymizeCustomers.php` staat nog open en wordt met ticket 47 opgepakt. Dat is precies het effect dat met de opname in het protocol werd beoogd: stijlafwijkingen verdwijnen vanzelf zodra een bestand wordt aangeraakt.
+**Herstel (ticket 47, uitgevoerd op 16 augustus 2026).** Beide bestanden zijn tijdens het herstel van BV-01 en BV-02 aangeraakt en zijn daarmee vanzelf langs Pint gegaan, omdat het protocol dat voorschrijft vóór het pushen. `vendor/bin/pint --test` meldt sinds 16 augustus geen afwijkingen meer. Dit is precies het beoogde effect van de opname in het protocol: stijlafwijkingen verdwijnen zodra een bestand toch al open ligt, in plaats van dat ze een eigen taak worden.
+
+---
+
+#### BV-09 — `anonymize()` schrijft naar een kolom die niet bestaat *(Hoog)*
+
+**Betreft:** US-28, `Customer::anonymize()`
+**Gevonden op:** 16 augustus 2026, tijdens het schrijven van de tests voor BV-03
+
+**Omschrijving.** De methode die de gegevens overschrijft zet acht velden, waaronder `'zip' => '**'`. De tabel `customers` heeft echter geen kolom `zip` maar `postal_code`; de kolom `zip` komt in geen enkele migratie voor. Omdat het model niets afschermt (`$guarded = []`) wordt die waarde één op één als kolom naar de database gestuurd. Dat heeft twee gevolgen tegelijk:
+
+1. De opdracht **loopt vast** op de eerste klant die hij wil anonimiseren, met een databasefout over een onbekende kolom.
+2. De **postcode wordt nooit gewist**. Dat is het veld dat in combinatie met een huisnummer een adres eenduidig herleidbaar maakt, en dus precies het veld dat de AVG-maatregel moet weghalen.
+
+**Waarom dit niet eerder is opgevallen.** De opdracht draait dagelijks, maar tot 16 augustus stond er geen klant in de database die oud genoeg was om aan de voorwaarde te voldoen. De lus liep dus altijd nul keer en de fout is nooit uitgekomen. Zodra de eerste klant de zeven jaar zou passeren, was de anonimisering stilzwijgend blijven hangen — er is geen test (BV-03) en de opdracht meldt niets als hij niets doet.
+
+**Herstel (binnen ticket 43).** `'zip'` is `'postal_code'` geworden. Aanvullend is de verwijdering van het gekoppelde account veilig gemaakt met `?->delete()`, zodat een klant die naar een inmiddels verwijderd account verwijst de hele opdracht niet meer laat vastlopen.
+
+**Bewijs.** `test_every_identifiable_field_is_wiped` controleert alle zeven velden apart, inclusief `postal_code`. `test_a_customer_who_still_books_is_left_alone` controleert de postcode nogmaals, nu vanuit de omgekeerde kant: bij een klant die ongemoeid moet blijven, moet die postcode er juist nog staan.
+
+**Conclusie.** Deze bevinding is niet gevonden door de software te gebruiken en ook niet door de tests te draaien, maar door een test te *schrijven* voor een functie die er nog geen had. Drie van de vier bevindingen op US-28 (BV-02, BV-04 en BV-09) zijn op die manier boven water gekomen.
 
 ---
 
@@ -496,29 +527,34 @@ Daarnaast telt de teller `$count` het aantal rijen en niet het aantal klanten, w
 
 ### 6.5 Conclusies
 
-1. **De basis staat.** 173 geautomatiseerde tests met 1.406 assertions dekken 29 van de 30 user stories af en draaien in 10,5 seconde. Daarmee is voldaan aan de aanleiding voor deze opdracht: elke ontwikkelaar kan vóór elke commit binnen enkele seconden vaststellen of hij iets heeft gebroken.
+1. **De basis staat.** 173 geautomatiseerde tests met ruim 1.400 assertions dekken 29 van de 30 user stories af en draaien in 10,5 seconde. Daarmee is voldaan aan de aanleiding voor deze opdracht: elke ontwikkelaar kan vóór elke commit binnen enkele seconden vaststellen of hij iets heeft gebroken.
 2. **Rechten zijn het best afgedekt.** De 29 tests in `RoutePermissionsTest` en `PermissionMiddlewareTest` controleren per route en per rol wie er wel en niet doorheen komt, inclusief gebruikers zonder rol en niet-ingelogde bezoekers. Dat is verantwoord: het uitlekken van klantgegevens is het grootste risico van dit systeem.
 3. **Groen is geen bewijs van werkende software.** Alle tests slaagden, en toch zijn er twee fouten met hoge prioriteit gevonden. BV-01 kwam aan het licht doordat de user story naast de test werd gelegd en bleek dat de test zijn eigen testdata had bijgesteld tot de code slaagde. Dit is de belangrijkste inhoudelijke conclusie: een test is alleen waardevol als de gebruikte gegevens overeenkomen met de werkelijkheid.
-4. **De ongeteste hoek is de gevaarlijkste gebleken.** De enige user story zonder dekking (US-28, anonimiseren) bevat de zwaarste fout (BV-02) én de enige PHPStan-melding (BV-04) én de helft van de stijlafwijkingen (BV-05). Ontbrekende dekking is daarmee geen administratief probleem maar een voorspeller van fouten.
+4. **De ongeteste hoek is de gevaarlijkste gebleken.** De enige user story zonder dekking (US-28, anonimiseren) bevat de zwaarste fout (BV-02), de enige PHPStan-melding (BV-04) en de helft van de stijlafwijkingen (BV-05) — en toen er alsnog een test voor werd geschreven, kwam daar meteen een vierde fout uit die de functie volledig onbruikbaar maakte (BV-09). Vier van de negen bevindingen komen uit één ongeteste functie van dertig regels. Ontbrekende dekking is daarmee geen administratief probleem maar de beste voorspeller van fouten die dit rapport heeft opgeleverd.
 5. **De regressiebewaking heeft zich al bewezen.** BV-06 laat zien dat één regel wijziging per Mailable zeven tests in vier bestanden raakte, zonder dat een gebruiker er iets van zou merken. Zonder suite was deze wijziging zonder verder onderzoek doorgevoerd.
 6. **De handmatige tests blijven nodig, maar zijn beperkt van omvang.** Van de negen handmatige testgevallen zijn er zeven akkoord, één met een aanvaard aandachtspunt (HT-07, horizontaal schuiven op een telefoon) en één afgekeurd (HT-08). Automatisering van de overige acht zou meer onderhoud kosten dan het per sprint doorlopen ervan.
 
-### 6.6 Hertest na het herstel van BV-01
+### 6.6 Hertest na het herstel
 
-Ticket 45 (BV-01) is als eerste opgepakt, vooruitlopend op de herstelweek, omdat de balie zonder werkende zoekfunctie op een papieren lijst was aangewezen. Na het herstel is de volledige suite opnieuw gedraaid.
+De twee bevindingen met hoge prioriteit zijn naar voren gehaald en op 16 augustus hersteld, vooruitlopend op de herstelweek. Daarbij zijn BV-03, BV-04, BV-05 en de nieuwe BV-09 meegelopen. Na het herstel is de volledige suite opnieuw gedraaid.
 
 | | Testronde 13-08-2026 | Hertest 16-08-2026 |
 |---|---|---|
-| Uitgevoerde tests | 173 | **193** |
-| Assertions | 1.406 | **1.447** |
+| Uitgevoerde tests | 173 | **213** |
+| Assertions | circa 1.400 | **circa 1.490** |
 | Gefaald | 0 | **0** |
-| Doorlooptijd | 10,49 s | 10,90 s |
-| PHPStan level 5 | 1 melding | 1 melding (BV-04, ongewijzigd) |
-| Laravel Pint | 2 bestanden afwijkend | 1 bestand afwijkend (`AnonymizeCustomers.php`) |
+| Doorlooptijd | 10,49 s | 14,39 s |
+| PHPStan level 5 | 1 melding | **0 meldingen** |
+| Laravel Pint | 2 bestanden afwijkend | **0 bestanden afwijkend** |
+| User stories zonder dekking | 1 (US-28) | **0** |
 
-De twintig nieuwe tests zitten volledig in `CustomerPhoneNumberTest`. Er zijn geen bestaande tests rood geworden, wat betekent dat het verplaatsen van de normalisatie naar het model geen neveneffecten heeft gehad op de boekingsflow, de accountaanmaak of de rechten. De regressiebewaking heeft hier dus voor de tweede keer zijn nut bewezen, nu bij het herstel in plaats van bij het ontstaan van een fout.
+Het aantal assertions staat hier bij benadering. Een deel van de tests loopt over gegenereerde gegevens uit de seeders, waardoor het aantal controles per ronde een paar tientallen verschilt terwijl het aantal tests gelijk blijft. Het testaantal is daarom de maat die in dit rapport telt; het aantal assertions geeft alleen de orde van grootte aan.
 
-Bevinding BV-01 is daarmee gesloten. US-20 is voor het eerst aantoonbaar afgedekt: niet alleen op het recht om te zoeken, maar op het zoeken zelf, met gegevens in de notatie waarin ze werkelijk in de database staan.
+De veertig nieuwe tests zitten in `CustomerPhoneNumberTest` (24), `AnonymizeCustomersTest` (10), `PaymentPageTest` (4), `DashboardCalendarTest` (1) en `RoutePermissionsTest` (1). De laatste vijf horen niet bij een bevinding uit dit rapport maar bij drie tickets uit opdracht 3 die nog openstonden en tegelijk zijn afgemaakt: 9b (betaalwijze en moment van ontvangst vastleggen bij een boeking), 23b (de dubbele API-route verwijderen) en 12b (het demo-account koppelen in de seeder). Er zijn geen bestaande tests rood geworden. Dat is belangrijker dan het aantal: de normalisatie van het telefoonnummer is naar het model verplaatst en raakt daarmee de boekingsflow, de accountaanmaak, de seeders en het baliescherm tegelijk. De suite laat zien dat geen van die vier iets van de verplaatsing merkt. De regressiebewaking heeft hier dus voor de tweede keer haar nut bewezen — nu niet bij het ontstaan van een fout, maar bij het herstellen ervan.
+
+**Meegenomen buiten de bevindingen om.** Doordat het telefoonnummer voortaan als kale cijfers wordt opgeslagen, toonden de schermen `0624815903` in plaats van `06-24815903`. Dat is opgelost met een afgeleide eigenschap op het model (`phone_number_formatted`) die de leesbare notatie samenstelt. Die keuze is bewust: hij staat op de server en is daarmee met PHPUnit te testen, terwijl dezelfde logica in een Vue-component buiten elke geautomatiseerde test zou vallen (zie 2.3). Alleen een Nederlands mobiel nummer en een internationaal nummer worden opgemaakt; bij vaste nummers verschilt de lengte van het netnummer en zou opmaken het juist minder leesbaar maken.
+
+Alle bevindingen met prioriteit hoog of midden zijn hiermee gesloten. Open blijven BV-07 (opruimen van de voorbeeldtests, laag) en BV-08 (restrisico wachtrij, bewust aanvaard).
 
 ---
 
@@ -532,17 +568,20 @@ De herstelwerkzaamheden zijn als nieuwe tickets aan de backlog uit opdracht 1 en
 
 | Ticket | ID | Wat wordt hersteld | Prioriteit | Schatting | Wie | Wanneer |
 |---|---|---|---|---|---|---|
-| 43 | BV-02 | Query in `customers:anonymize` omzetten zodat per klant de meest recente reservering telt; teller herstellen; magische waarde vervangen | Hoog | 5 uur | DV | ma 17 aug |
-| 44 | BV-03 | Testklasse `AnonymizeCustomersTest` met vier scenario's, waaronder het scenario dat BV-02 aantoont | Midden | 4 uur | RS | di 18 aug |
-| 45 | BV-01 | Telefoonnummer normaliseren bij opslaan, validatie op drie plaatsen gelijktrekken, bestaande gegevens omzetten, test aanpassen | Hoog | 3 uur | DV | **gereed 16 aug**, naar voren gehaald |
-| 46 | BV-04 | Alias typeerbaar maken (valt grotendeels samen met BV-02); PHPStan opnieuw draaien tot nul meldingen | Midden | 2 uur | DV | wo 19 aug |
-| 47 | BV-05 | `vendor/bin/pint` draaien en het resultaat nalopen; controle opnemen in het testprotocol | Laag | 0,5 uur | RS | wo 19 aug |
+| 43 | BV-02, BV-09 | Query in `customers:anonymize` omzetten zodat per klant de meest recente reservering telt; teller herstellen; magische waarde vervangen; `zip` corrigeren naar `postal_code` | Hoog | 5 uur | DV | **gereed 16 aug** |
+| 44 | BV-03 | Testklasse `AnonymizeCustomersTest` met vier scenario's, waaronder het scenario dat BV-02 aantoont | Midden | 4 uur | RS | **gereed 16 aug** |
+| 45 | BV-01 | Telefoonnummer normaliseren bij opslaan, validatie op drie plaatsen gelijktrekken, bestaande gegevens omzetten, test aanpassen | Hoog | 3 uur | DV | **gereed 16 aug** |
+| 46 | BV-04 | Alias typeerbaar maken (valt grotendeels samen met BV-02); PHPStan opnieuw draaien tot nul meldingen | Midden | 2 uur | DV | **gereed 16 aug**, meegelopen met 43 |
+| 47 | BV-05 | `vendor/bin/pint` draaien en het resultaat nalopen; controle opnemen in het testprotocol | Laag | 0,5 uur | RS | **gereed 16 aug**, meegelopen met 43 en 45 |
 | 48 | BV-07 | Voorbeeldtests verwijderen en de bruikbare test opnemen in `HomepageLocationsTest` | Laag | 1 uur | RS | wo 19 aug |
 | 49 | — | Volledige regressieronde en handmatig protocol opnieuw doorlopen als opleverkeuring | — | 1 uur | MV | do 20 aug |
+| 50 | — | Leesbare weergave van het telefoonnummer op de schermen, als gevolg van ticket 45 | Laag | 1 uur | DV | **gereed 16 aug** |
 | — | BV-08 | Bewust niet ingepland, risico aanvaard (zie 7.3) | Laag | 0 | — | — |
-| | | **Totaal** | | **16,5 uur** | | |
+| | | **Totaal** | | **17,5 uur** | | |
 
-**Naar voren gehaald.** Ticket 45 (BV-01) is op 16 augustus al uitgevoerd, in overleg met de opdrachtgever (besluit 3 in 7.3): de balie werkte zonder de zoekfunctie met een papieren lijst en dat kon niet nog een week duren. De hertest staat in 6.6. De overige tickets blijven in de herstelweek staan.
+**Naar voren gehaald.** De tickets 43 tot en met 47 en 50 zijn op 16 augustus al uitgevoerd, in overleg met de opdrachtgever (besluiten 1 tot en met 3 in 7.3). Voor BV-02 gold dat de opdracht tot het herstel uit de planning was gehaald en de camping in die tussentijd niet aan de bewaartermijn voldeed; voor BV-01 dat de balie met een papieren lijst werkte. Geen van beide kon nog een week wachten. De hertest staat in 6.6.
+
+Van de zestien geplande uren zijn er vier niet nodig geweest: ticket 46 loste zichzelf op met het herstel van BV-02, en ticket 47 liep mee met twee bestanden die toch al open lagen. Daar staat één nieuwe fout tegenover (BV-09), die binnen ticket 43 is meegenomen, plus het nieuwe ticket 50 van één uur. Per saldo is de herstelweek daarmee ruim een dag korter dan begroot. In de herstelweek resteren nog de tickets 48 en 49.
 
 **Volgorde en afhankelijkheden.** BV-03 wordt bewust ná BV-02 ingepland maar door een andere ontwikkelaar geschreven, zodat degene die de test schrijft niet degene is die de oplossing heeft bedacht. BV-04 wordt na BV-02 opgepakt omdat de voorgestelde oplossing voor BV-02 (subquery in plaats van join) de PHPStan-melding waarschijnlijk vanzelf oplost; de twee uur is gereserveerd voor het geval dat niet zo blijkt te zijn. BV-01 gaat naar DV omdat de wijziging aan het gegevensmodel raakt en hij de omzetting van de bestaande gegevens uitvoert.
 
@@ -552,7 +591,8 @@ De herstelwerkzaamheden zijn als nieuwe tickets aan de backlog uit opdracht 1 en
 
 | Datum | Activiteit |
 |---|---|
-| ma 17 – wo 19 augustus | Herstel van tickets 43 t/m 48 (BV-01 t/m BV-05 en BV-07) |
+| za 16 augustus | Tickets 43 t/m 47 en 50 uitgevoerd, naar voren gehaald (BV-01 t/m BV-05 en BV-09) |
+| ma 17 – wo 19 augustus | Ticket 48 (BV-07); de vrijgevallen tijd gaat naar het bijwerken van dit rapport en de overdracht |
 | do 20 augustus | Ticket 49: volledige regressieronde + handmatig testprotocol; dit geldt als opleverkeuring |
 | vr 21 augustus | Oplevering aan de opdrachtgever |
 

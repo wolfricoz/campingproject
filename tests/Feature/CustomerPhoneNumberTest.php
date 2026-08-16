@@ -55,6 +55,48 @@ class CustomerPhoneNumberTest extends TestCase
         $this->assertMatchesRegularExpression('/^\d{10,15}$/', $customer->fresh()->phone_number);
     }
 
+    // === What the screens show.
+
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function formattedNotations(): array
+    {
+        return [
+            'a dutch mobile number gets its dash back' => ['0624815903', '06-24815903'],
+            'an international number is shown with a plus' => ['0032478112094', '+32478112094'],
+            'a landline is shown as it is stored' => ['0765224417', '0765224417'],
+        ];
+    }
+
+    #[DataProvider('formattedNotations')]
+    public function test_the_screens_get_a_readable_version_of_the_number(string $stored, string $shown): void
+    {
+        $customer = Customer::factory()->create(['phone_number' => $stored]);
+
+        $this->assertSame($shown, $customer->fresh()->phone_number_formatted);
+    }
+
+    public function test_the_readable_version_travels_along_to_the_screen(): void
+    {
+        $customer = Customer::factory()->create([
+            'email' => 'sanne.devries@example.nl',
+            'phone_number' => '06-24815903',
+        ]);
+
+        $this->actingAs($this->receptionist())
+            ->getJson(route('api.customers.find', [
+                'id' => $customer->id,
+                'email' => $customer->email,
+                'phone_number' => $customer->phone_number,
+            ]))
+            ->assertOk()
+            ->assertJsonFragment([
+                'phone_number' => '0624815903',
+                'phone_number_formatted' => '06-24815903',
+            ]);
+    }
+
     // === Looking a customer up at the desk.
 
     public function test_a_receptionist_finds_a_customer_that_the_factory_created(): void

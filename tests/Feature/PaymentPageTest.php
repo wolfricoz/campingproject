@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\PaymentMethod;
 use App\Mail\PaymentReceivedMail;
 use App\Models\Arrangement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,7 +46,7 @@ class PaymentPageTest extends TestCase
 
         $arrangement = Arrangement::factory()->create(['payment_received' => false]);
 
-        $this->post(route('payment.complete'), ['guid' => $arrangement->guid])
+        $this->post(route('payment.complete'), ['guid' => $arrangement->guid, 'payment_method' => 'ideal'])
             ->assertRedirect(route('home'));
 
         $this->assertTrue($arrangement->fresh()->payment_received);
@@ -59,7 +60,7 @@ class PaymentPageTest extends TestCase
 
         $arrangement = Arrangement::factory()->create(['payment_received' => true]);
 
-        $this->post(route('payment.complete'), ['guid' => $arrangement->guid])
+        $this->post(route('payment.complete'), ['guid' => $arrangement->guid, 'payment_method' => 'ideal'])
             ->assertRedirect(route('home'));
 
         Mail::assertNothingSent();
@@ -67,6 +68,79 @@ class PaymentPageTest extends TestCase
 
     public function test_a_payment_for_an_unknown_guid_returns_a_not_found(): void
     {
-        $this->post(route('payment.complete'), ['guid' => 'bestaat-niet'])->assertNotFound();
+        $this->post(route('payment.complete'), ['guid' => 'bestaat-niet', 'payment_method' => 'ideal'])
+            ->assertNotFound();
+    }
+
+    public function test_the_chosen_payment_method_and_the_moment_of_receipt_are_stored(): void
+    {
+        Mail::fake();
+        $this->freezeTime();
+
+        $arrangement = Arrangement::factory()->create([
+            'payment_received' => false,
+            'payment_method' => null,
+            'payment_received_at' => null,
+        ]);
+
+        $this->post(route('payment.complete'), [
+            'guid' => $arrangement->guid,
+            'payment_method' => 'bank_transfer',
+        ])->assertRedirect(route('home'));
+
+        $arrangement->refresh();
+
+        $this->assertSame(PaymentMethod::BANK_TRANSFER, $arrangement->payment_method);
+        $this->assertTrue($arrangement->payment_received);
+        $this->assertNotNull($arrangement->payment_received_at);
+        $this->assertSame(
+            now()->format('Y-m-d H:i:s'),
+            $arrangement->payment_received_at->format('Y-m-d H:i:s'),
+        );
+    }
+
+    public function test_a_payment_without_a_method_is_refused(): void
+    {
+        Mail::fake();
+
+        $arrangement = Arrangement::factory()->create(['payment_received' => false]);
+
+        $this->post(route('payment.complete'), ['guid' => $arrangement->guid])
+            ->assertSessionHasErrors('payment_method');
+
+        $this->assertFalse($arrangement->fresh()->payment_received);
+        Mail::assertNothingQueued();
+    }
+
+    public function test_a_payment_method_we_do_not_offer_is_refused(): void
+    {
+        Mail::fake();
+
+        $arrangement = Arrangement::factory()->create(['payment_received' => false]);
+
+        $this->post(route('payment.complete'), [
+            'guid' => $arrangement->guid,
+            'payment_method' => 'contant',
+        ])->assertSessionHasErrors('payment_method');
+
+        $this->assertFalse($arrangement->fresh()->payment_received);
+        Mail::assertNothingQueued();
+    }
+
+    public function test_a_second_payment_does_not_overwrite_the_first_method(): void
+    {
+        Mail::fake();
+
+        $arrangement = Arrangement::factory()->create([
+            'payment_received' => true,
+            'payment_method' => PaymentMethod::IDEAL,
+        ]);
+
+        $this->post(route('payment.complete'), [
+            'guid' => $arrangement->guid,
+            'payment_method' => 'bank_transfer',
+        ])->assertRedirect(route('home'));
+
+        $this->assertSame(PaymentMethod::IDEAL, $arrangement->fresh()->payment_method);
     }
 }

@@ -135,6 +135,18 @@ const isUnavailable = computed(() =>
 // Once the customer has checked out the reservation is done, so it can only be viewed and printed
 const isCheckedOut = computed(() => props.arrangement?.booking_status === 'finished');
 
+// De betaalwijze komt als sleutel uit de back-end; hier hangt het label eraan.
+const paymentMethodLabels = {
+    ideal: 'iDeal',
+    bank_transfer: 'Bankoverschrijving',
+};
+
+const paymentMethodLabel = computed(() => {
+    const method = props.arrangement?.payment_method;
+
+    return method ? __(paymentMethodLabels[method] ?? method) : '';
+});
+
 let availabilityTimer = null;
 
 function checkAvailability() {
@@ -492,6 +504,11 @@ async function printArrangement() {
                           :class="form.payment_received ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
                         {{ form.payment_received ? __('Ja') : __('Nee') }}
                     </span>
+                    <!-- De betaalwijze staat er alleen als de gast er een heeft gekozen. -->
+                    <template v-if="paymentMethodLabel">
+                        <span class="text-sm font-medium text-gray-700">{{ __('Betaalwijze') }}:</span>
+                        <span class="text-sm text-gray-700">{{ paymentMethodLabel }}</span>
+                    </template>
                     <!-- Een nieuwe reservering heeft nog geen status, dus dan tonen we het label niet. -->
                     <template v-if="arrangement">
                         <span class="text-sm font-medium text-gray-700">{{ __('Reservering status') }}:</span>
@@ -726,6 +743,10 @@ async function printArrangement() {
                         <tr>
                             <th class="border border-gray-400 px-3 py-2 text-left">{{ __('Betaling ontvangen') }}</th>
                             <td class="border border-gray-400 px-3 py-2">{{ form.payment_received ? __('Ja') : __('Nee') }}</td>
+                        </tr>
+                        <tr v-if="paymentMethodLabel">
+                            <th class="border border-gray-400 px-3 py-2 text-left">{{ __('Betaalwijze') }}</th>
+                            <td class="border border-gray-400 px-3 py-2">{{ paymentMethodLabel }}</td>
                         </tr>
                     </tbody>
                 </table>

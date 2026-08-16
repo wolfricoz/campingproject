@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ArrangementStatus;
+use App\Enums\PaymentMethod;
 use App\Mail\PaymentReceivedMail;
 use App\Models\Arrangement;
 use App\Models\Location;
@@ -134,19 +135,22 @@ class ArrangementController extends Controller
     {
         $data = $request->validate([
             'id' => 'required|integer|exists:arrangements,id',
+            // The desk registers a payment that came in by bank; the guest may already
+            // have picked a method online, in that case it is kept.
+            'payment_method' => ['nullable', Rule::enum(PaymentMethod::class)],
         ]);
 
         $arrangement = Arrangement::findOrFail($data['id']);
 
-        if ($arrangement->payment_received) {
+        $method = isset($data['payment_method']) ? PaymentMethod::from($data['payment_method']) : null;
+
+        if (! $arrangement->registerPayment($method)) {
             return response()->json([
                 'status' => 'success!',
                 'message' => __('Deze boeking is al betaald.'),
                 'updated_data' => $arrangement,
             ]);
         }
-
-        $arrangement->update(['payment_received' => true]);
 
         Mail::to($arrangement->customer->email)->send(new PaymentReceivedMail($arrangement));
 
