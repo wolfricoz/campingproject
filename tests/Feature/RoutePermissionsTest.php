@@ -226,9 +226,10 @@ class RoutePermissionsTest extends TestCase
 
     public function test_a_receptionist_may_look_a_customer_up(): void
     {
+        // The phone number is deliberately left to the factory: a test that writes
+        // its own notation proves the permission, not that the lookup works.
         $customer = Customer::factory()->create([
             'email' => 'sanne.devries@example.nl',
-            'phone_number' => '0624815903',
         ]);
 
         $this->actingAs($this->userWithRole('receptionist'))

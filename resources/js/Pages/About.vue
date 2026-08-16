@@ -11,6 +11,11 @@ defineProps({
     },
 });
 
+const story = {
+    origin: 'De Syntec Camping was opgericht door Martijn Babens Beulens rond 2006, waar hij zijn eerste cabine met de hand heeft gebouwd. Over de jaren is de camping erg gegroeid en elk jaar komen er nieuwe cabines bij!',
+    cabins: 'Onze cabines zijn de standaard voor luxe en geavanceerde cabines; elke cabine is voorzien met een hoog aantal technische wonderen zoals masseerstoelen, waterbedden en nog veel meer! En dit alles voor een goede prijs!',
+};
+
 const values = [
     {title: 'Rust en ruimte', body: 'Onze cabines staan in een natuur gebied waar je niemand zal vinden om je heen, ideaal voor mensen.'},
     {title: 'Midden in de natuur', body:
@@ -43,12 +48,8 @@ const values = [
                 <h2 class="text-2xl font-bold text-gray-800">{{ __('Ons verhaal') }}</h2>
                 <div class="mt-4 space-y-4 text-sm leading-relaxed text-gray-600">
                     <!-- TODO Rico: hier komt het verhaal van de camping. -->
-                    <p>{{ __('De Syntec Camping was opgericht door Martijn Babens Beulens rond 2006, waar hij zijn eerste cabine met de \
-                        hand heeft gebouwd. Over de jaren is de camping erg gegroeid en elk jaar komen er nieuwe cabines bij! ')
-                        }}</p>
-                    <p>{{ __('Onze cabines zijn de standaard voor luxe en geavanceerde cabines; elke cabine is voorzien met een hoge \
-                        aantal van technische wonderen zoals masseer stoelen, water bedden, en nog veel meer! En all dit voor een goede \
-                        prijs!') }}</p>
+                    <p>{{ __(story.origin) }}</p>
+                    <p>{{ __(story.cabins) }}</p>
                 </div>
             </div>
         </div>

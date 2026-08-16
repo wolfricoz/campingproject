@@ -40,11 +40,22 @@ class CustomerController extends Controller
         return response()->json($customers);
     }
 
+    /**
+     * Looks a customer up on e-mail and phone number for the desk.
+     *
+     * The phone number is normalised before it is validated, so the desk may
+     * type it the way it is printed on the reservation: with or without spaces,
+     * dashes or a country code.
+     */
     public function find(Request $request): JsonResponse
     {
+        $request->merge([
+            'phone_number' => Customer::normalisePhoneNumber($request->string('phone_number')->toString()),
+        ]);
+
         $data = $request->validate([
             'email' => 'required|string|email|max:255',
-            'phone_number' => 'required|string|min:10|max:10',
+            'phone_number' => 'required|digits_between:10,15',
         ]);
         $customer = Customer::findByEmailAndPhoneNumber($data['email'], $data['phone_number']);
 
@@ -69,7 +80,6 @@ class CustomerController extends Controller
         ]);
         $data = $data['customer'];
         $data['email'] = strtolower($data['email']);
-        $data['phone_number'] = str_replace(' ', '', $data['phone_number']);
 
         $result = Customer::createNewCustomer($data);
 

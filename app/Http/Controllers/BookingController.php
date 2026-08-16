@@ -65,7 +65,6 @@ class BookingController extends Controller
 
         $data = $customerData['customer'];
         $data['email'] = strtolower($data['email']);
-        $data['phone_number'] = str_replace(' ', '', $data['phone_number']);
 
         $customerResult = Customer::createNewCustomer($data);
 

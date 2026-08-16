@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Mail\NewAccountMail;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,9 +32,43 @@ class Customer extends Model
         return $this->hasMany(Arrangement::class);
     }
 
+    /**
+     * Keeps every phone number in one notation, no matter how it was typed in.
+     *
+     * The desk enters `06-24815903`, the booking screen `06 12345678` and the
+     * seeder `0032-478112094`; without this they are three different values and
+     * a customer can never be looked up again.
+     */
+    public static function normalisePhoneNumber(?string $phoneNumber): ?string
+    {
+        if ($phoneNumber === null) {
+            return null;
+        }
+
+        $withoutPlus = preg_replace('/^\+/', '00', trim($phoneNumber)) ?? '';
+
+        return preg_replace('/\D/', '', $withoutPlus) ?? '';
+    }
+
+    /**
+     * Normalises the phone number on the way into the database, so the stored
+     * notation can never depend on which screen it came from.
+     *
+     * @return Attribute<never, ?string>
+     */
+    protected function phoneNumber(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value): ?string => self::normalisePhoneNumber($value),
+        );
+    }
+
     public static function findByEmailAndPhoneNumber(string $email, ?string $phone_number): ?self
     {
-        return (new self)->where('email', $email)->where('phone_number', $phone_number)->first();
+        return (new self)
+            ->where('email', $email)
+            ->where('phone_number', self::normalisePhoneNumber($phone_number))
+            ->first();
     }
 
     /**
@@ -49,7 +84,7 @@ class Customer extends Model
         $customer = self::find($data['id'] ?? 0);
 
         if (! $customer) {
-            $customer = self::findByEmailAndPhoneNumber($data['email'], $data['phone_number']);
+            $customer = self::findByEmailAndPhoneNumber($data['email'], $data['phone_number'] ?? null);
         }
 
         if ($data['create_account'] && ! $customer?->user_id) {
@@ -80,9 +115,10 @@ class Customer extends Model
 
         return $customer->refresh();
     }
+
     public function anonymize()
     {
-        if ($this->user_id){
+        if ($this->user_id) {
             // since the user hold an email; it has to be deleted.
             User::find($this->user_id)->delete();
         }
@@ -90,7 +126,7 @@ class Customer extends Model
         $this->update(
             [
                 'name' => 'Klant Geanonimiseerd',
-                'email' => $this->guid . '@syntec-camping.nl',
+                'email' => $this->guid.'@syntec-camping.nl',
                 'phone_number' => '0612345678',
                 'street_name' => '**',
                 'street_number' => '**',
