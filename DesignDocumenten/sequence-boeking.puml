@@ -1,0 +1,74 @@
+@startuml sequence-boekingsflow
+' Sequencediagram: één boeking van aanvraag tot bevestiging
+' Boekingssysteem camping
+
+skinparam shadowing false
+skinparam sequence {
+    ArrowColor Black
+    LifeLineBorderColor Grey
+    ParticipantBorderColor Black
+    ParticipantBackgroundColor White
+    ActorBorderColor Black
+}
+
+actor "Klant" as Klant
+participant "Boekingsscherm" as UI
+participant "Boekingssysteem" as App
+database "Database" as DB
+queue "Wachtrij" as Q
+participant "Mailserver" as Mail
+participant "Betaaldienst" as PSP
+actor "Campingeigenaar" as Eigenaar
+
+== Beschikbaarheid controleren ==
+
+Klant -> UI : kiest plek en periode
+UI -> App : vraag beschikbaarheid op
+App -> DB : zoek boekingen in die periode
+note right of DB
+  Eigen boekingen en
+  boekingen van Blookers.com
+end note
+DB --> App : gevonden boekingen
+
+alt plek is bezet
+    App --> UI : melding dat de plek bezet is
+    UI --> Klant : toon andere vrije plekken
+else plek is vrij
+    App --> UI : plek is vrij, toon de prijs
+end
+
+== Boeking vastleggen ==
+
+Klant -> UI : bevestigt de boeking
+UI -> App : sla de boeking op
+App -> DB : boeking opslaan met status aangevraagd
+DB --> App : boekingsnummer
+App -> Q : bedankmail voor de klant
+App -> Q : melding voor de campingeigenaar
+App --> UI : boeking is vastgelegd
+UI --> Klant : toon ontvangstbevestiging
+
+Q -> Mail : verstuur bedankmail
+Mail --> Klant : bedankmail
+Q -> Mail : verstuur melding
+Mail --> Eigenaar : melding van de nieuwe boeking
+
+== Betaling ==
+
+Klant -> UI : kiest betalen
+UI -> PSP : start de betaling
+PSP --> Klant : betaalscherm
+Klant -> PSP : betaalt
+PSP --> App : betaling is gestart
+App -> DB : betaling vastleggen als in behandeling
+
+== Bevestiging door de eigenaar ==
+
+Eigenaar -> App : ziet de betaling op de rekening\nen bevestigt deze
+App -> DB : status naar bevestigd
+App -> Q : bevestigingsmail voor de klant
+Q -> Mail : verstuur bevestigingsmail
+Mail --> Klant : bevestigingsmail
+
+@enduml

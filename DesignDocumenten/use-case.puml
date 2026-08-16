@@ -1,0 +1,95 @@
+@startuml use-case-boekingssysteem
+' Use-case-diagram boekingssysteem camping
+' Rollen en rechten komen uit database/seeders/RolesAndPermissionsSeeder.php
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam nodesep 30
+skinparam ranksep 60
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+}
+
+actor "Bezoeker" as Bezoeker
+actor "Geregistreerde\nklant" as Klant
+actor "Baliemedewerker" as Balie
+actor "Beheerder" as Beheerder
+
+Bezoeker <|-- Klant
+Balie <|-- Beheerder
+
+rectangle "Boekingssysteem camping" {
+
+    usecase "Beschikbaarheid\nopvragen" as UC1
+    usecase "Boeking aanmaken" as UC2
+    usecase "Online betalen" as UC3
+    usecase "Eigen reserveringen\ninzien" as UC4
+
+    usecase "Alle boekingen\ninzien" as UC5
+    usecase "Boeking maken\nvoor een klant" as UC6
+    usecase "Boeking wijzigen" as UC7
+    usecase "Boeking annuleren" as UC8
+    usecase "Klant opzoeken" as UC9
+    usecase "In- en uitchecken" as UC10
+    usecase "Reservering\nafdrukken" as UC11
+    usecase "Nieuws beheren" as UC12
+    usecase "Betaling\nbevestigen" as UC13
+
+    usecase "Boeking goedkeuren\nof afwijzen" as UC14
+    usecase "Locaties beheren" as UC15
+
+    usecase "Boeking van\nBlookers verwerken" as UC16
+    usecase "Mail versturen" as UC17
+}
+
+actor "Blookers.com" as Blookers
+actor "Mailserver" as Mailserver
+actor "Betaaldienst" as Betaaldienst
+
+' Bezoeker en geregistreerde klant
+
+Bezoeker --> UC2
+Bezoeker --> UC3
+
+Klant --> UC4
+
+' Baliemedewerker
+Balie --> UC5
+Balie --> UC6
+Balie --> UC7
+Balie --> UC8
+Balie --> UC9
+Balie --> UC10
+Balie --> UC11
+Balie --> UC12
+Balie --> UC13
+
+' Beheerder
+Beheerder --> UC14
+Beheerder --> UC15
+
+' Externe systemen
+Blookers --> UC16
+UC3 --> Betaaldienst
+UC17 --> Mailserver
+
+' Samenhang tussen de use cases
+UC2 ..> UC1 : <<include>>
+UC2 ..> UC17 : <<include>>
+UC6 ..> UC1 : <<include>>
+UC13 ..> UC17 : <<include>>
+UC16 ..> UC1 : <<include>>
+
+note bottom of UC1
+  Telt ook de boekingen
+  van Blookers.com mee
+end note
+
+note bottom of UC17
+  Gaat via een wachtrij,
+  los van het boekingsproces
+end note
+
+@enduml
